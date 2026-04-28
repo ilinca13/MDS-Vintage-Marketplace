@@ -23,6 +23,13 @@ INSTALLED_APPS = [
     # Third-party
     'rest_framework',
     'corsheaders',
+    # Local apps
+    'users',
+    'products',
+    'orders',
+    'messaging',
+    'reviews',
+    'wishlist',
 ]
 
 MIDDLEWARE = [
@@ -119,4 +126,9 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+AUTH_USER_MODEL = 'users.User'
