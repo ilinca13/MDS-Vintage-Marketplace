@@ -1,0 +1,38 @@
+services:
+  db:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-vintage_marketplace}
+      POSTGRES_USER: ${POSTGRES_USER:-vintage_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-vintage_pass}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-vintage_user} -d ${POSTGRES_DB:-vintage_marketplace}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./backend
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8000:8000"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-vintage_marketplace}
+      POSTGRES_USER: ${POSTGRES_USER:-vintage_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-vintage_pass}
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:-changeme-in-production}
+      DEBUG: ${DEBUG:-True}
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
