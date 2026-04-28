@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'messaging',
     'reviews',
     'wishlist',
+    'django_extensions',
 ]
 
 MIDDLEWARE = [
