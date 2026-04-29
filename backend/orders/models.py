@@ -15,9 +15,19 @@ class Order(models.Model):
         on_delete=models.CASCADE,
         related_name='orders',
     )
+    seller = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='sales',
+    )
+    product = models.ForeignKey(
+        'products.Product',
+        on_delete=models.PROTECT,
+        related_name='orders',
+    )
+    price_at_purchase = models.DecimalField(max_digits=10, decimal_places=2)
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
     shipping_address = models.TextField()
-    total_price = models.DecimalField(max_digits=10, decimal_places=2)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -25,18 +35,4 @@ class Order(models.Model):
         ordering = ['-created_at']
 
     def __str__(self):
-        return f'Order #{self.id} by {self.buyer.username}'
-
-
-class OrderItem(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
-    product = models.ForeignKey(
-        'products.Product',
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name='order_items',
-    )
-    price_at_purchase = models.DecimalField(max_digits=10, decimal_places=2)
-
-    def __str__(self):
-        return f'{self.product} in Order #{self.order.id}'
+        return f'Order #{self.id} — {self.product.title} ({self.buyer.username} → {self.seller.username})'
