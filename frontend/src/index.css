@@ -1,10 +1,9 @@
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-body {
-  background-color: #fafaf8;
-  color: #1a1a1a;
+@layer base {
+  body {
+    @apply bg-gray-50 text-gray-900 antialiased;
+  }
 }
