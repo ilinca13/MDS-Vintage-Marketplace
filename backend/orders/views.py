@@ -15,7 +15,7 @@ class OrderListCreateView(generics.ListCreateAPIView):
             Order.objects
             .filter(Q(buyer=user) | Q(seller=user))
             .select_related('product__category', 'product__seller', 'buyer', 'seller')
-            .prefetch_related('product__images')
+            .prefetch_related('product__images', 'review')
         )
 
     def get_serializer_class(self):

@@ -50,7 +50,11 @@ class OrderCreateSerializer(serializers.ModelSerializer):
 class OrderSerializer(serializers.ModelSerializer):
     product_detail = ProductListSerializer(source='product', read_only=True)
     buyer_username = serializers.CharField(source='buyer.username', read_only=True)
+    buyer_id = serializers.IntegerField(source='buyer.id', read_only=True)
     seller_username = serializers.CharField(source='seller.username', read_only=True)
+    seller_id = serializers.IntegerField(source='seller.id', read_only=True)
+    has_review = serializers.SerializerMethodField()
+    review_id  = serializers.SerializerMethodField()
 
     class Meta:
         model = Order
@@ -58,14 +62,24 @@ class OrderSerializer(serializers.ModelSerializer):
             'id', 'status', 'payment_method', 'shipping_method', 'shipping_cost',
             'shipping_address', 'price_at_purchase',
             'created_at', 'updated_at',
-            'buyer_username', 'seller_username',
+            'buyer_id', 'buyer_username',
+            'seller_id', 'seller_username',
             'product', 'product_detail',
+            'has_review', 'review_id',
         )
         read_only_fields = (
             'id', 'status', 'shipping_cost', 'price_at_purchase',
             'created_at', 'updated_at',
-            'buyer_username', 'seller_username', 'product_detail',
+            'buyer_id', 'buyer_username',
+            'seller_id', 'seller_username',
+            'product_detail', 'has_review', 'review_id',
         )
+
+    def get_has_review(self, obj):
+        return hasattr(obj, 'review')
+
+    def get_review_id(self, obj):
+        return obj.review.id if hasattr(obj, 'review') else None
 
 
 class OrderStatusUpdateSerializer(serializers.ModelSerializer):

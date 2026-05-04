@@ -1,8 +1,15 @@
 import { Link } from 'react-router-dom'
 
-export default function ReviewCard({ rv }) {
+export default function ReviewCard({ rv, highlighted = false }) {
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 p-5">
+    <div
+      id={`review-${rv.id}`}
+      className={`rounded-2xl border p-5 transition-all duration-700 ${
+        highlighted
+          ? 'bg-brand-50 border-brand-300 ring-2 ring-brand-200'
+          : 'bg-white border-gray-200'
+      }`}
+    >
 
       {/* Product preview */}
       {rv.product_id && (
