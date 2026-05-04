@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useSearchParams } from 'react-router-dom'
 import api from '../api/axios'
 import ProductCard from '../components/product/ProductCard'
 import ReviewCard from '../components/review/ReviewCard'
@@ -25,12 +25,15 @@ function StarBar({ label, value }) {
 
 export default function PublicProfilePage() {
   const { id } = useParams()
+  const [searchParams] = useSearchParams()
 
   const [profile, setProfile]   = useState(null)
   const [summary, setSummary]   = useState(null)
   const [products, setProducts] = useState([])
   const [reviews, setReviews]   = useState([])
-  const [activeTab, setActiveTab] = useState('listings')
+  const [activeTab, setActiveTab] = useState(
+    searchParams.get('tab') === 'reviews' ? 'reviews' : 'listings'
+  )
   const [loading, setLoading]   = useState(true)
   const [tabLoading, setTabLoading] = useState(false)
 
@@ -56,10 +59,19 @@ export default function PublicProfilePage() {
         .finally(() => setTabLoading(false))
     } else {
       api.get('/reviews/', { params: { seller: id } })
-        .then(({ data }) => setReviews(data.results || []))
+        .then(({ data }) => {
+          setReviews(data.results || [])
+          const targetReview = searchParams.get('review')
+          if (targetReview) {
+            setTimeout(() => {
+              const el = document.getElementById(`review-${targetReview}`)
+              if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+            }, 150)
+          }
+        })
         .finally(() => setTabLoading(false))
     }
-  }, [activeTab, profile, id])
+  }, [activeTab, profile, id, searchParams])
 
   if (loading) {
     return (
@@ -191,7 +203,13 @@ export default function PublicProfilePage() {
                   <p className="font-medium">Nicio recenzie încă</p>
                 </div>
               ) : (
-                reviews.map((rv) => <ReviewCard key={rv.id} rv={rv} />)
+                reviews.map((rv) => (
+                  <ReviewCard
+                    key={rv.id}
+                    rv={rv}
+                    highlighted={searchParams.get('review') === String(rv.id)}
+                  />
+                ))
               )}
             </div>
           )
