@@ -9,7 +9,7 @@ from .models import Order
 class OrderCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
-        fields = ('product', 'shipping_address')
+        fields = ('product', 'payment_method', 'shipping_method', 'shipping_address')
 
     def validate_product(self, product):
         if product.status != Product.Status.ACTIVE:
@@ -28,11 +28,19 @@ class OrderCreateSerializer(serializers.ModelSerializer):
 
         return product
 
+    def validate(self, attrs):
+        shipping_method = attrs.get('shipping_method', Order.ShippingMethod.POSTA_ROMANA)
+        if shipping_method != Order.ShippingMethod.RIDICARE and not attrs.get('shipping_address', '').strip():
+            raise serializers.ValidationError({'shipping_address': 'Adresa de livrare este obligatorie.'})
+        return attrs
+
     def create(self, validated_data):
         product = validated_data['product']
+        shipping_method = validated_data.get('shipping_method', Order.ShippingMethod.POSTA_ROMANA)
         validated_data['buyer'] = self.context['request'].user
         validated_data['seller'] = product.seller
         validated_data['price_at_purchase'] = product.price
+        validated_data['shipping_cost'] = Order.SHIPPING_COSTS.get(shipping_method, 0)
         order = super().create(validated_data)
         product.status = Product.Status.RESERVED
         product.save(update_fields=['status'])
@@ -47,13 +55,14 @@ class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = (
-            'id', 'status', 'shipping_address', 'price_at_purchase',
+            'id', 'status', 'payment_method', 'shipping_method', 'shipping_cost',
+            'shipping_address', 'price_at_purchase',
             'created_at', 'updated_at',
             'buyer_username', 'seller_username',
             'product', 'product_detail',
         )
         read_only_fields = (
-            'id', 'status', 'price_at_purchase',
+            'id', 'status', 'shipping_cost', 'price_at_purchase',
             'created_at', 'updated_at',
             'buyer_username', 'seller_username', 'product_detail',
         )
