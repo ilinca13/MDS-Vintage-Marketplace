@@ -29,7 +29,10 @@ class ProductListCreateView(generics.ListCreateAPIView):
     def get_queryset(self):
         qs = Product.objects.select_related('seller', 'category').prefetch_related('images')
         if self.request.method == 'GET':
-            return qs.exclude(status=Product.Status.DELETED)
+            seller_username = self.request.query_params.get('seller')
+            if seller_username and self.request.user.is_authenticated and self.request.user.username == seller_username:
+                return qs.exclude(status=Product.Status.DELETED)
+            return qs.filter(status=Product.Status.ACTIVE)
         return qs
 
     def get_serializer_class(self):
