@@ -24,7 +24,7 @@ class ConversationListView(generics.ListAPIView):
         return (
             Conversation.objects
             .filter(participants=self.request.user)
-            .prefetch_related('participants', 'messages')
+            .prefetch_related('participants', 'messages__sender', 'product__images')
             .select_related('product')
             .order_by('-messages__created_at')
             .distinct()
