@@ -1,10 +1,38 @@
-function App() {
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import Layout from './components/layout/Layout'
+import ProtectedRoute from './components/common/ProtectedRoute'
+import { AuthProvider } from './context/AuthContext'
+import HomePage from './pages/HomePage'
+import LoginPage from './pages/LoginPage'
+import MessagesPage from './pages/MessagesPage'
+import OrdersPage from './pages/OrdersPage'
+import ProductDetailPage from './pages/ProductDetailPage'
+import ProfilePage from './pages/ProfilePage'
+import RegisterPage from './pages/RegisterPage'
+import SellPage from './pages/SellPage'
+import WishlistPage from './pages/WishlistPage'
+
+export default function App() {
   return (
-    <div style={{ fontFamily: 'sans-serif', textAlign: 'center', marginTop: '4rem' }}>
-      <h1>Vintage Marketplace</h1>
-      <p>Frontend is running. Backend API available at <code>/api/</code>.</p>
-    </div>
+    <BrowserRouter>
+      <AuthProvider>
+        <Routes>
+          <Route element={<Layout />}>
+            {/* Public */}
+            <Route path="/" element={<HomePage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/products/:id" element={<ProductDetailPage />} />
+
+            {/* Protected */}
+            <Route path="/sell" element={<ProtectedRoute><SellPage /></ProtectedRoute>} />
+            <Route path="/wishlist" element={<ProtectedRoute><WishlistPage /></ProtectedRoute>} />
+            <Route path="/orders" element={<ProtectedRoute><OrdersPage /></ProtectedRoute>} />
+            <Route path="/messages" element={<ProtectedRoute><MessagesPage /></ProtectedRoute>} />
+            <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+          </Route>
+        </Routes>
+      </AuthProvider>
+    </BrowserRouter>
   )
 }
-
-export default App
