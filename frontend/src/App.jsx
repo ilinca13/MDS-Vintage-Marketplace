@@ -9,6 +9,7 @@ import OrdersPage from './pages/OrdersPage'
 import ProductDetailPage from './pages/ProductDetailPage'
 import ProfilePage from './pages/ProfilePage'
 import RegisterPage from './pages/RegisterPage'
+import EditProductPage from './pages/EditProductPage'
 import SellPage from './pages/SellPage'
 import WishlistPage from './pages/WishlistPage'
 
@@ -26,6 +27,7 @@ export default function App() {
 
             {/* Protected */}
             <Route path="/sell" element={<ProtectedRoute><SellPage /></ProtectedRoute>} />
+            <Route path="/products/:id/edit" element={<ProtectedRoute><EditProductPage /></ProtectedRoute>} />
             <Route path="/wishlist" element={<ProtectedRoute><WishlistPage /></ProtectedRoute>} />
             <Route path="/orders" element={<ProtectedRoute><OrdersPage /></ProtectedRoute>} />
             <Route path="/messages" element={<ProtectedRoute><MessagesPage /></ProtectedRoute>} />

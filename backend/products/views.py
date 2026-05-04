@@ -2,7 +2,7 @@ from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 
 from .filters import ProductFilter
-from .models import Category, Product
+from .models import Category, Product, ProductImage
 from .permissions import IsOwnerOrReadOnly
 from .serializers import (
     CategorySerializer,
@@ -79,3 +79,15 @@ class ProductImageUploadView(generics.CreateAPIView):
         ctx = super().get_serializer_context()
         ctx['product'] = self.get_product()
         return ctx
+
+
+class ProductImageDeleteView(generics.DestroyAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self):
+        return generics.get_object_or_404(
+            ProductImage,
+            pk=self.kwargs['img_pk'],
+            product__pk=self.kwargs['pk'],
+            product__seller=self.request.user,
+        )
