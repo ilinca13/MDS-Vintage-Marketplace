@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import api from '../api/axios'
 import { useAuth } from '../context/AuthContext'
 
@@ -201,19 +201,35 @@ export default function ProductDetailPage() {
           </div>
         )}
 
-        {/* Seller */}
-        <div className="border-t border-gray-100 pt-4">
-          <p className="text-sm text-gray-500">Vânzător</p>
-          <p className="font-semibold text-gray-800">@{product.seller_username}</p>
-          {summary && summary.total_reviews > 0 && (
-            <div className="mt-2 space-y-1">
-              <p className="text-xs text-gray-400">{summary.total_reviews} recenzii · Scor general: <span className="font-semibold text-gray-700">{summary.overall_score}/5</span></p>
-              <StarScore label="Comunicare" value={summary.avg_communication} />
-              <StarScore label="Viteză livrare" value={summary.avg_shipping_speed} />
-              <StarScore label="Timp răspuns" value={summary.avg_response_time} />
+            {/* Seller */}
+            <div className="border-t border-gray-100 pt-4">
+              <p className="text-sm text-gray-500 mb-2">Vânzător</p>
+              <Link
+                to={`/users/${product.seller_id}`}
+                className="flex items-center gap-3 group"
+              >
+                <div className="w-10 h-10 rounded-full bg-brand-100 flex items-center justify-center overflow-hidden shrink-0">
+                  {product.seller_avatar ? (
+                    <img src={product.seller_avatar} alt={product.seller_username} className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="text-sm font-bold text-brand-500">
+                      {product.seller_username[0].toUpperCase()}
+                    </span>
+                  )}
+                </div>
+                <span className="font-semibold text-gray-800 group-hover:text-brand-600 transition">
+                  @{product.seller_username}
+                </span>
+              </Link>
+              {summary && summary.total_reviews > 0 && (
+                <div className="mt-3 space-y-1">
+                  <p className="text-xs text-gray-400">{summary.total_reviews} recenzii · Scor general: <span className="font-semibold text-gray-700">{summary.overall_score}/5</span></p>
+                  <StarScore label="Comunicare" value={summary.avg_communication} />
+                  <StarScore label="Viteză livrare" value={summary.avg_shipping_speed} />
+                  <StarScore label="Timp răspuns" value={summary.avg_response_time} />
+                </div>
+              )}
             </div>
-          )}
-        </div>
 
         {/* Seller actions */}
         {isSeller && (

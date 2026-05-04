@@ -15,7 +15,9 @@ class ReviewListCreateView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def get_queryset(self):
-        qs = Review.objects.select_related('reviewer', 'seller', 'order')
+        qs = Review.objects.select_related(
+            'reviewer', 'seller', 'order__product'
+        ).prefetch_related('order__product__images')
         seller_id = self.request.query_params.get('seller')
         if seller_id:
             qs = qs.filter(seller__id=seller_id)
@@ -31,7 +33,9 @@ class ReviewDetailView(generics.RetrieveAPIView):
     """
     GET /api/reviews/<id>/  — public detail of a single review
     """
-    queryset = Review.objects.select_related('reviewer', 'seller', 'order')
+    queryset = Review.objects.select_related(
+        'reviewer', 'seller', 'order__product'
+    ).prefetch_related('order__product__images')
     serializer_class = ReviewSerializer
     permission_classes = [permissions.AllowAny]
 

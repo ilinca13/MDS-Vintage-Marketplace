@@ -8,6 +8,7 @@ import MessagesPage from './pages/MessagesPage'
 import OrdersPage from './pages/OrdersPage'
 import ProductDetailPage from './pages/ProductDetailPage'
 import ProfilePage from './pages/ProfilePage'
+import PublicProfilePage from './pages/PublicProfilePage'
 import RegisterPage from './pages/RegisterPage'
 import EditProductPage from './pages/EditProductPage'
 import SellPage from './pages/SellPage'
@@ -24,6 +25,7 @@ export default function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/products/:id" element={<ProductDetailPage />} />
+            <Route path="/users/:id" element={<PublicProfilePage />} />
 
             {/* Protected */}
             <Route path="/sell" element={<ProtectedRoute><SellPage /></ProtectedRoute>} />

@@ -42,6 +42,7 @@ class ProductDetailSerializer(serializers.ModelSerializer):
     """Full serializer used in retrieve views."""
     seller_username = serializers.CharField(source='seller.username', read_only=True)
     seller_id = serializers.IntegerField(source='seller.id', read_only=True)
+    seller_avatar = serializers.SerializerMethodField()
     category = CategorySerializer(read_only=True)
     images = ProductImageSerializer(many=True, read_only=True)
 
@@ -51,9 +52,15 @@ class ProductDetailSerializer(serializers.ModelSerializer):
             'id', 'title', 'description', 'price',
             'condition', 'status', 'size', 'brand', 'location',
             'views_count', 'created_at', 'updated_at',
-            'seller_id', 'seller_username',
+            'seller_id', 'seller_username', 'seller_avatar',
             'category', 'images',
         )
+
+    def get_seller_avatar(self, obj):
+        request = self.context.get('request')
+        if obj.seller.avatar:
+            return request.build_absolute_uri(obj.seller.avatar.url) if request else obj.seller.avatar.url
+        return None
 
 
 class ProductWriteSerializer(serializers.ModelSerializer):
