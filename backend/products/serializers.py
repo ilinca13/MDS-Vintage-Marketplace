@@ -10,9 +10,14 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class ProductImageSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+
     class Meta:
         model = ProductImage
         fields = ('id', 'image', 'is_primary', 'order')
+
+    def get_image(self, obj):
+        return obj.image.url if obj.image else None
 
 
 class ProductListSerializer(serializers.ModelSerializer):
@@ -32,10 +37,7 @@ class ProductListSerializer(serializers.ModelSerializer):
 
     def get_primary_image(self, obj):
         image = obj.images.filter(is_primary=True).first() or obj.images.first()
-        if image:
-            request = self.context.get('request')
-            return request.build_absolute_uri(image.image.url) if request else image.image.url
-        return None
+        return image.image.url if image else None
 
 
 class ProductDetailSerializer(serializers.ModelSerializer):
@@ -57,10 +59,7 @@ class ProductDetailSerializer(serializers.ModelSerializer):
         )
 
     def get_seller_avatar(self, obj):
-        request = self.context.get('request')
-        if obj.seller.avatar:
-            return request.build_absolute_uri(obj.seller.avatar.url) if request else obj.seller.avatar.url
-        return None
+        return obj.seller.avatar.url if obj.seller.avatar else None
 
 
 class ProductWriteSerializer(serializers.ModelSerializer):
@@ -79,9 +78,14 @@ class ProductWriteSerializer(serializers.ModelSerializer):
 
 
 class ProductImageUploadSerializer(serializers.ModelSerializer):
+    image_url = serializers.SerializerMethodField()
+
     class Meta:
         model = ProductImage
-        fields = ('id', 'image', 'is_primary', 'order')
+        fields = ('id', 'image', 'image_url', 'is_primary', 'order')
+
+    def get_image_url(self, obj):
+        return obj.image.url if obj.image else None
 
     def create(self, validated_data):
         product = self.context['product']

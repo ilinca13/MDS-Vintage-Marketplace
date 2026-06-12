@@ -103,8 +103,8 @@ export default function PublicProfilePage() {
       {/* Profile header */}
       <div className="bg-white rounded-2xl border border-gray-200 p-6 flex gap-5 items-center">
         <div className="w-20 h-20 rounded-full bg-brand-100 flex items-center justify-center overflow-hidden shrink-0">
-          {profile.avatar ? (
-            <img src={profile.avatar} alt={displayName} className="w-full h-full object-cover" />
+          {(profile.avatar_url || profile.avatar) ? (
+            <img src={profile.avatar_url || profile.avatar} alt={displayName} className="w-full h-full object-cover" />
           ) : (
             <span className="text-2xl font-bold text-brand-500">
               {profile.username[0].toUpperCase()}

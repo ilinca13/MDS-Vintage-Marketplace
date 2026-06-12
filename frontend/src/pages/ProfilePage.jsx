@@ -133,8 +133,8 @@ export default function ProfilePage() {
             onClick={() => avatarInputRef.current.click()}
             title="Schimbă fotografia"
           >
-            {user.avatar ? (
-              <img src={user.avatar} alt={displayName} className="w-full h-full object-cover" />
+            {(user.avatar_url || user.avatar) ? (
+              <img src={user.avatar_url || user.avatar} alt={displayName} className="w-full h-full object-cover" />
             ) : (
               <span className="text-3xl font-bold text-brand-500">
                 {user.username[0].toUpperCase()}

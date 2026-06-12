@@ -68,7 +68,4 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     def get_product_image(self, obj):
         image = obj.order.product.images.filter(is_primary=True).first() or obj.order.product.images.first()
-        if not image:
-            return None
-        request = self.context.get('request')
-        return request.build_absolute_uri(image.image.url) if request else image.image.url
+        return image.image.url if image else None

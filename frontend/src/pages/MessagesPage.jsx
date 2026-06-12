@@ -7,8 +7,8 @@ function Avatar({ user, size = 'md' }) {
   const sizes = { sm: 'w-8 h-8 text-xs', md: 'w-10 h-10 text-sm' }
   return (
     <div className={`${sizes[size]} rounded-full bg-brand-100 flex items-center justify-center overflow-hidden shrink-0`}>
-      {user?.avatar ? (
-        <img src={user.avatar} alt={user.username} className="w-full h-full object-cover" />
+      {(user?.avatar_url || user?.avatar) ? (
+        <img src={user.avatar_url || user.avatar} alt={user.username} className="w-full h-full object-cover" />
       ) : (
         <span className="font-bold text-brand-500">
           {user?.username?.[0]?.toUpperCase() || '?'}
