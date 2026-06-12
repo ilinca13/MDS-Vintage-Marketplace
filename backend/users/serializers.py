@@ -25,15 +25,26 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
+    avatar_url = serializers.SerializerMethodField()
+
     class Meta:
         model = User
         fields = ('id', 'username', 'email', 'first_name', 'last_name',
-                  'avatar', 'bio', 'location', 'phone_number', 'date_joined')
-        read_only_fields = ('id', 'username', 'email', 'date_joined')
+                  'avatar', 'avatar_url', 'bio', 'location', 'phone_number', 'date_joined')
+        read_only_fields = ('id', 'username', 'email', 'date_joined', 'avatar_url')
+
+    def get_avatar_url(self, obj):
+        return obj.avatar.url if obj.avatar else None
 
 
 class PublicUserSerializer(serializers.ModelSerializer):
+    avatar_url = serializers.SerializerMethodField()
+
     class Meta:
         model = User
         fields = ('id', 'username', 'first_name', 'last_name',
-                  'avatar', 'bio', 'location', 'date_joined')
+                  'avatar', 'avatar_url', 'bio', 'location', 'date_joined')
+        read_only_fields = ('avatar_url',)
+
+    def get_avatar_url(self, obj):
+        return obj.avatar.url if obj.avatar else None

@@ -45,10 +45,7 @@ class ConversationSerializer(serializers.ModelSerializer):
         other = obj.participants.exclude(id=request.user.id).first()
         if not other:
             return None
-        avatar_url = None
-        if other.avatar:
-            avatar_url = request.build_absolute_uri(other.avatar.url)
-        return {'id': other.id, 'username': other.username, 'avatar': avatar_url}
+        return {'id': other.id, 'username': other.username, 'avatar': other.avatar.url if other.avatar else None}
 
     def get_last_message(self, obj):
         msg = obj.messages.last()
@@ -65,10 +62,7 @@ class ConversationSerializer(serializers.ModelSerializer):
         if not obj.product:
             return None
         image = obj.product.images.filter(is_primary=True).first() or obj.product.images.first()
-        if not image:
-            return None
-        request = self.context.get('request')
-        return request.build_absolute_uri(image.image.url) if request else image.image.url
+        return image.image.url if image else None
 
 
 class ConversationDetailSerializer(serializers.ModelSerializer):
@@ -87,19 +81,13 @@ class ConversationDetailSerializer(serializers.ModelSerializer):
         other = obj.participants.exclude(id=request.user.id).first()
         if not other:
             return None
-        avatar_url = None
-        if other.avatar:
-            avatar_url = request.build_absolute_uri(other.avatar.url)
-        return {'id': other.id, 'username': other.username, 'avatar': avatar_url}
+        return {'id': other.id, 'username': other.username, 'avatar': other.avatar.url if other.avatar else None}
 
     def get_product_image(self, obj):
         if not obj.product:
             return None
         image = obj.product.images.filter(is_primary=True).first() or obj.product.images.first()
-        if not image:
-            return None
-        request = self.context.get('request')
-        return request.build_absolute_uri(image.image.url) if request else image.image.url
+        return image.image.url if image else None
 
 
 class ConversationStartSerializer(serializers.Serializer):
