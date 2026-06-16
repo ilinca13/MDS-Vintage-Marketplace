@@ -6,7 +6,6 @@
 
 @layer base {
   body {
-    /* Subtle multi-shade light green -> blue gradient */
     background: linear-gradient(135deg, #bce8cf 0%, #dff7fb 35%, #c6e6d9 65%, #f0fff9 100%);
     background-attachment: fixed;
     -webkit-font-smoothing: antialiased;
@@ -16,7 +15,7 @@
   }
 }
 
-/* Utility class to apply Yanone Kaffeesatz only where needed (search inputs) */
+
 .font-yanone {
   font-family: 'Yanone Kaffeesatz', 'Poppins', Inter, system-ui, sans-serif;
 }

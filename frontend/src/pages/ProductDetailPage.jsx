@@ -6,7 +6,7 @@ import { useAuth } from '../context/AuthContext'
 const CONDITION_LABEL = {
   new: 'Nou cu etichete',
   like_new: 'Ca nou',
-  good: 'Bună stare',
+  good: 'Stare bună',
   fair: 'Stare acceptabilă',
   poor: 'Stare slabă',
 }

@@ -5,7 +5,7 @@ import api from '../api/axios'
 const CONDITIONS = [
   { value: 'new',      label: 'Nou cu etichete' },
   { value: 'like_new', label: 'Ca nou' },
-  { value: 'good',     label: 'Bună stare' },
+  { value: 'good',     label: 'Stare bună' },
   { value: 'fair',     label: 'Stare acceptabilă' },
   { value: 'poor',     label: 'Stare slabă' },
 ]
