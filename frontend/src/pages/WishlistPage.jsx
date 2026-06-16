@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import api from '../api/axios'
 import ProductCard from '../components/product/ProductCard'
+import SortDropdown from '../components/common/SortDropdown'
+import EXTRA_CATEGORIES from '../config/categories'
 
 const SORT_OPTIONS = [
   { value: '-created_at', label: 'Cele mai recente' },
@@ -13,7 +15,7 @@ const SORT_OPTIONS = [
 const CONDITIONS = [
   { value: 'new',      label: 'Nou cu etichete' },
   { value: 'like_new', label: 'Ca nou' },
-  { value: 'good',     label: 'Bună stare' },
+  { value: 'good',     label: 'Stare bună' },
   { value: 'fair',     label: 'Stare acceptabilă' },
   { value: 'poor',     label: 'Stare slabă' },
 ]
@@ -40,7 +42,10 @@ export default function WishlistPage() {
   const totalPages = Math.ceil(total / PAGE_SIZE)
 
   useEffect(() => {
-    api.get('/categories/').then(({ data }) => setCategories(data))
+    api.get('/categories/').then(({ data }) => {
+      const normalized = data.map((c) => ({ ...c, id: String(c.id) }))
+      setCategories(normalized)
+    })
   }, [])
 
   useEffect(() => {
@@ -105,17 +110,13 @@ export default function WishlistPage() {
             placeholder="Caută în favorite..."
             value={filters.search}
             onChange={(e) => handleFilter('search', e.target.value)}
-            className="border border-gray-300 rounded-lg px-3 py-2 text-sm w-48 focus:outline-none focus:ring-2 focus:ring-brand-400"
+            className="border border-gray-300 rounded-lg px-3 py-2 text-sm w-48 focus:outline-none focus:ring-2 focus:ring-brand-400 font-yanone"
           />
-          <select
-            value={filters.ordering}
-            onChange={(e) => handleFilter('ordering', e.target.value)}
-            className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white"
-          >
-            {SORT_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value}>{o.label}</option>
-            ))}
-          </select>
+            <SortDropdown
+              options={SORT_OPTIONS}
+              value={filters.ordering}
+              onChange={(val) => handleFilter('ordering', val)}
+            />
         </div>
       </div>
 
@@ -126,7 +127,7 @@ export default function WishlistPage() {
           <div className="flex items-center justify-between">
             <span className="text-sm font-semibold text-gray-700">Filtre</span>
             {activeFiltersCount > 0 && (
-              <button onClick={handleReset} className="text-xs text-brand-500 hover:underline">
+              <button onClick={handleReset} className="text-xs text-pink-700 bg-pink-100 border-4 border-pink-300 rounded-xl px-2 py-0.5 hover:bg-pink-200 transition focus:outline-none focus:ring-2 focus:ring-pink-200">
                 Resetează ({activeFiltersCount})
               </button>
             )}
@@ -212,7 +213,7 @@ export default function WishlistPage() {
                 {activeFiltersCount > 0 ? 'Niciun produs cu filtrele selectate' : 'Lista de favorite e goală'}
               </p>
               {activeFiltersCount > 0 ? (
-                <button onClick={handleReset} className="mt-3 text-sm text-brand-500 hover:underline">
+                <button onClick={handleReset} className="mt-3 text-sm text-pink-700 bg-pink-100 border-4 border-pink-300 rounded-xl px-3 py-1 hover:bg-pink-200 transition focus:outline-none focus:ring-2 focus:ring-pink-200">
                   Resetează filtrele
                 </button>
               ) : (
@@ -254,7 +255,7 @@ export default function WishlistPage() {
                   <button
                     disabled={page === 1}
                     onClick={() => setPage((p) => p - 1)}
-                    className="px-4 py-2 text-sm border border-gray-300 rounded-lg disabled:opacity-40 hover:bg-gray-50 transition"
+                    className="px-4 py-2 text-sm border border-gray-300 rounded-lg disabled:opacity-40 hover:bg-brand-50 transition"
                   >
                     ← Înapoi
                   </button>
@@ -262,7 +263,7 @@ export default function WishlistPage() {
                   <button
                     disabled={page === totalPages}
                     onClick={() => setPage((p) => p + 1)}
-                    className="px-4 py-2 text-sm border border-gray-300 rounded-lg disabled:opacity-40 hover:bg-gray-50 transition"
+                    className="px-4 py-2 text-sm border border-gray-300 rounded-lg disabled:opacity-40 hover:bg-brand-50 transition"
                   >
                     Înainte →
                   </button>

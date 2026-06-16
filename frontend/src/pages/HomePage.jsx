@@ -2,7 +2,9 @@ import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import api from '../api/axios'
 import FilterSidebar from '../components/product/FilterSidebar'
+import SortDropdown from '../components/common/SortDropdown'
 import ProductCard from '../components/product/ProductCard'
+import EXTRA_CATEGORIES from '../config/categories'
 
 const DEFAULT_FILTERS = {
   search: '',
@@ -37,7 +39,10 @@ export default function HomePage() {
   const totalPages = Math.ceil(total / PAGE_SIZE)
 
   useEffect(() => {
-    api.get('/categories/').then(({ data }) => setCategories(data))
+    api.get('/categories/').then(({ data }) => {
+      const normalized = data.map((c) => ({ ...c, id: String(c.id) }))
+      setCategories(normalized)
+    })
   }, [])
 
   useEffect(() => {
@@ -74,15 +79,11 @@ export default function HomePage() {
           <p className="text-sm text-gray-500">
             {loading ? 'Se încarcă...' : `${total} produse găsite`}
           </p>
-          <select
+          <SortDropdown
+            options={SORT_OPTIONS}
             value={filters.ordering}
-            onChange={(e) => setFilters((f) => ({ ...f, ordering: e.target.value, page: 1 }))}
-            className="border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
-          >
-            {SORT_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value}>{o.label}</option>
-            ))}
-          </select>
+            onChange={(val) => setFilters((f) => ({ ...f, ordering: val, page: 1 }))}
+          />
         </div>
 
         {/* Grid */}
@@ -112,7 +113,7 @@ export default function HomePage() {
             <button
               disabled={filters.page === 1}
               onClick={() => setFilters((f) => ({ ...f, page: f.page - 1 }))}
-              className="px-4 py-2 text-sm border border-gray-300 rounded-lg disabled:opacity-40 hover:bg-gray-50 transition"
+              className="px-4 py-2 text-sm border border-gray-300 rounded-lg disabled:opacity-40 hover:bg-brand-50 transition"
             >
               ← Înapoi
             </button>
@@ -122,7 +123,7 @@ export default function HomePage() {
             <button
               disabled={filters.page === totalPages}
               onClick={() => setFilters((f) => ({ ...f, page: f.page + 1 }))}
-              className="px-4 py-2 text-sm border border-gray-300 rounded-lg disabled:opacity-40 hover:bg-gray-50 transition"
+              className="px-4 py-2 text-sm border border-gray-300 rounded-lg disabled:opacity-40 hover:bg-brand-50 transition"
             >
               Înainte →
             </button>

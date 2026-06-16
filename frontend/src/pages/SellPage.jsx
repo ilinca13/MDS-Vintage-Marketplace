@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api from '../api/axios'
+import EXTRA_CATEGORIES from '../config/categories'
 
 const CONDITIONS = [
   { value: 'new',      label: 'Nou cu etichete' },
   { value: 'like_new', label: 'Ca nou' },
-  { value: 'good',     label: 'Bună stare' },
+  { value: 'good',     label: 'Stare bună' },
   { value: 'fair',     label: 'Stare acceptabilă' },
   { value: 'poor',     label: 'Stare slabă' },
 ]
@@ -15,6 +16,7 @@ const SIZES = ['XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', 'One size', 'Alta
 export default function SellPage() {
   const navigate = useNavigate()
   const fileInputRef = useRef()
+  const submittingRef = useRef(false)
 
   const [categories, setCategories] = useState([])
   const [form, setForm] = useState({
@@ -30,7 +32,10 @@ export default function SellPage() {
   const [aiHashtags, setAiHashtags] = useState([])
 
   useEffect(() => {
-    api.get('/categories/').then(({ data }) => setCategories(data))
+    api.get('/categories/').then(({ data }) => {
+      const normalized = data.map((c) => ({ ...c, id: String(c.id) }))
+      setCategories(normalized)
+    })
   }, [])
 
   const handleChange = (e) => {
@@ -95,6 +100,8 @@ export default function SellPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    if (submittingRef.current) return
+    submittingRef.current = true
     setLoading(true)
     setErrors({})
 
@@ -102,24 +109,34 @@ export default function SellPage() {
       const { data: product } = await api.post('/products/', {
         ...form,
         price: parseFloat(form.price),
-        category: form.category || null,
+        // If user picked a client-side-only category (one of EXTRA_CATEGORIES), send null
+        category: EXTRA_CATEGORIES.some((c) => c.id === form.category) ? null : (form.category ? Number(form.category) : null),
       })
 
-      for (let i = 0; i < images.length; i++) {
-        const fd = new FormData()
-        fd.append('image', images[i])
-        fd.append('is_primary', i === 0 ? 'true' : 'false')
-        fd.append('order', i)
-        await api.post(`/products/${product.id}/images/`, fd, {
-          headers: { 'Content-Type': 'multipart/form-data' },
-        })
-      }
+      // Navigate to main page immediately so the create page unmounts and user can't repost.
+      navigate('/')
 
-      navigate(`/products/${product.id}`)
+      // Upload images in background (fire-and-forget). Errors are swallowed.
+      ;(async () => {
+        for (let i = 0; i < images.length; i++) {
+          try {
+            const fd = new FormData()
+            fd.append('image', images[i])
+            fd.append('is_primary', i === 0 ? 'true' : 'false')
+            fd.append('order', i)
+            await api.post(`/products/${product.id}/images/`, fd, {
+              headers: { 'Content-Type': 'multipart/form-data' },
+            })
+          } catch (e) {
+            // ignore upload errors — product page is shown regardless
+          }
+        }
+      })()
     } catch (err) {
       setErrors(err.response?.data || { non_field_errors: ['A apărut o eroare.'] })
     } finally {
       setLoading(false)
+      submittingRef.current = false
     }
   }
 

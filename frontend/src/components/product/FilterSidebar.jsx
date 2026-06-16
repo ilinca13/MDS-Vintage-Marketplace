@@ -1,7 +1,7 @@
 const CONDITIONS = [
   { value: 'new', label: 'Nou cu etichete' },
   { value: 'like_new', label: 'Ca nou' },
-  { value: 'good', label: 'Bună stare' },
+  { value: 'good', label: 'Stare bună' },
   { value: 'fair', label: 'Stare acceptabilă' },
   { value: 'poor', label: 'Stare slabă' },
 ]
@@ -88,7 +88,7 @@ export default function FilterSidebar({ filters, onChange, categories }) {
       {/* Reset */}
       <button
         onClick={() => onChange({ search: '', category: '', condition: '', min_price: '', max_price: '', ordering: '-created_at', page: 1 })}
-        className="text-sm text-red-500 hover:text-red-700 transition"
+        className="text-sm text-pink-700 bg-pink-100 border-2 border-pink-300 rounded-md px-3 py-1.5 hover:bg-pink-200 transition focus:outline-none focus:ring-2 focus:ring-pink-200"
       >
         Resetează filtrele
       </button>

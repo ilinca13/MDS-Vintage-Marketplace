@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import api from '../api/axios'
+import EXTRA_CATEGORIES from '../config/categories'
 import { useAuth } from '../context/AuthContext'
 
 const CONDITIONS = [
   { value: 'new',      label: 'Nou cu etichete' },
   { value: 'like_new', label: 'Ca nou' },
-  { value: 'good',     label: 'Bună stare' },
+  { value: 'good',     label: 'Stare bună' },
   { value: 'fair',     label: 'Stare acceptabilă' },
   { value: 'poor',     label: 'Stare slabă' },
 ]
@@ -18,6 +19,7 @@ export default function EditProductPage() {
   const { user } = useAuth()
   const navigate = useNavigate()
   const fileInputRef = useRef()
+  const submittingRef = useRef(false)
 
   const [categories, setCategories] = useState([])
   const [existingImages, setExistingImages] = useState([])
@@ -44,14 +46,15 @@ export default function EditProductPage() {
         title:       product.title,
         description: product.description,
         price:       product.price,
-        category:    product.category?.id || '',
+        category:    product.category?.id ? String(product.category.id) : '',
         condition:   product.condition,
         size:        product.size || '',
         brand:       product.brand || '',
         location:    product.location || '',
       })
       setExistingImages(product.images || [])
-      setCategories(cats)
+      const normalized = cats.map((c) => ({ ...c, id: String(c.id) }))
+      setCategories(normalized)
     }).finally(() => setPageLoading(false))
   }, [id, user, navigate])
 
@@ -141,30 +144,48 @@ export default function EditProductPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    if (submittingRef.current) return
+    submittingRef.current = true
     setLoading(true)
     setErrors({})
     try {
-      await api.patch(`/products/${id}/`, {
-        ...form,
-        price: parseFloat(form.price),
-        category: form.category || null,
-      })
+        // If user selected a client-side-only category, omit the `category` field
+        // so the backend keeps the existing category. Otherwise include numeric id or null.
+        const isExtra = EXTRA_CATEGORIES.some((c) => c.id === form.category)
+        const payload = { ...form, price: parseFloat(form.price) }
+        if (!isExtra) {
+          payload.category = form.category ? Number(form.category) : null
+        } else {
+          // ensure we don't send the client-side id
+          delete payload.category
+        }
 
-      for (let i = 0; i < newImages.length; i++) {
-        const fd = new FormData()
-        fd.append('image', newImages[i])
-        fd.append('is_primary', existingImages.length === 0 && i === 0 ? 'true' : 'false')
-        fd.append('order', existingImages.length + i)
-        await api.post(`/products/${id}/images/`, fd, {
-          headers: { 'Content-Type': 'multipart/form-data' },
-        })
-      }
+        await api.patch(`/products/${id}/`, payload)
 
+      // Navigate immediately so the edit page unmounts and user can't resubmit.
       navigate(`/products/${id}`)
+
+      // Upload new images in background; swallow errors.
+      ;(async () => {
+        for (let i = 0; i < newImages.length; i++) {
+          try {
+            const fd = new FormData()
+            fd.append('image', newImages[i])
+            fd.append('is_primary', existingImages.length === 0 && i === 0 ? 'true' : 'false')
+            fd.append('order', existingImages.length + i)
+            await api.post(`/products/${id}/images/`, fd, {
+              headers: { 'Content-Type': 'multipart/form-data' },
+            })
+          } catch (e) {
+            // ignore
+          }
+        }
+      })()
     } catch (err) {
       setErrors(err.response?.data || { non_field_errors: ['A apărut o eroare.'] })
     } finally {
       setLoading(false)
+      submittingRef.current = false
     }
   }
 
