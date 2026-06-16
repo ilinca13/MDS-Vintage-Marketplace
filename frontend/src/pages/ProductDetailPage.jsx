@@ -43,6 +43,7 @@ export default function ProductDetailPage() {
   const [shippingMethod, setShippingMethod] = useState('posta_romana')
   const [showBuyModal, setShowBuyModal] = useState(false)
   const [error, setError] = useState('')
+  const [deleteLoading, setDeleteLoading] = useState(false)
 
   const SHIPPING_OPTIONS = [
     { value: 'posta_romana', label: 'Poșta Română', cost: 15 },
@@ -234,15 +235,34 @@ export default function ProductDetailPage() {
         {/* Seller actions */}
         {isSeller && (
           <div className="border-t border-gray-100 pt-4 space-y-2">
-            <button
-              onClick={() => navigate(`/products/${id}/edit`)}
-              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border border-brand-400 text-brand-600 hover:bg-brand-50 font-medium transition"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-              </svg>
-              Editează anunțul
-            </button>
+                <button
+                  onClick={() => navigate(`/products/${id}/edit`)}
+                  className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border border-brand-400 text-brand-600 hover:bg-brand-50 font-medium transition"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                  Editează anunțul
+                </button>
+
+                <button
+                  onClick={async () => {
+                    if (!window.confirm('Ștergi acest anunț? Această acțiune este ireversibilă.')) return
+                    setDeleteLoading(true)
+                    try {
+                      await api.delete(`/products/${id}/`)
+                      navigate('/')
+                    } catch (err) {
+                      alert(err.response?.data?.detail || 'Nu s-a putut șterge anunțul.')
+                    } finally {
+                      setDeleteLoading(false)
+                    }
+                  }}
+                  disabled={deleteLoading}
+                  className="w-full bg-red-500 hover:bg-red-600 disabled:opacity-60 text-white font-semibold py-3 rounded-xl transition"
+                >
+                  {deleteLoading ? 'Se șterge...' : 'Șterge anunțul'}
+                </button>
           </div>
         )}
 
