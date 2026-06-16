@@ -72,7 +72,7 @@ export default function SellPage() {
       if (form.condition) fd.append('condition', form.condition)
       const catName = categories.find((c) => String(c.id) === String(form.category))?.name || ''
       if (catName) fd.append('category', catName)
-      if (images[0]) fd.append('image', images[0])
+      images.forEach((img) => fd.append('images', img))
 
       const { data } = await api.post('/ai/generate-description/', fd, {
         headers: { 'Content-Type': 'multipart/form-data' },

@@ -105,13 +105,19 @@ export default function EditProductPage() {
       const catName = categories.find((c) => String(c.id) === String(form.category))?.name || ''
       if (catName) fd.append('category', catName)
 
-      // Prefer a newly uploaded file; fall back to fetching the first existing image
-      if (newImages[0]) {
-        fd.append('image', newImages[0])
-      } else if (existingImages[0]?.image) {
-        const resp = await fetch(existingImages[0].image)
-        const blob = await resp.blob()
-        fd.append('image', blob, 'product.jpg')
+      // Send all newly uploaded files
+      newImages.forEach((img) => fd.append('images', img))
+
+      // Fetch all existing images as blobs and append them too
+      if (existingImages.length > 0) {
+        const fetched = await Promise.all(
+          existingImages.map(async (img, i) => {
+            const resp = await fetch(img.image)
+            const blob = await resp.blob()
+            return { blob, name: `existing_${i}.jpg` }
+          })
+        )
+        fetched.forEach(({ blob, name }) => fd.append('images', blob, name))
       }
 
       const { data } = await api.post('/ai/generate-description/', fd, {
