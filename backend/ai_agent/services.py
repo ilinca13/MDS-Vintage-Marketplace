@@ -1,7 +1,7 @@
 """
-AI Agent services — image-to-text captioning (BLIP large) + description generation.
+AI Agent services — image-to-text captioning (BLIP) + description generation.
 
-Model: Salesforce/blip-image-captioning-large
+Model: Salesforce/blip-image-captioning-base
 Loaded lazily on first request and cached for subsequent calls.
 """
 
@@ -16,48 +16,17 @@ def _get_caption_pipeline():
         from transformers import pipeline
         _caption_pipeline = pipeline(
             "image-to-text",
-            model="Salesforce/blip-image-captioning-large",
+            model="Salesforce/blip-image-captioning-base",
         )
     return _caption_pipeline
 
 
-def generate_image_captions(image_files: list) -> list[str]:
-    """Run BLIP on each uploaded image and return one caption per image."""
-    if not image_files:
-        return []
+def generate_image_caption(image_file) -> str:
+    """Run BLIP on the uploaded image and return a caption string."""
+    img = Image.open(image_file).convert("RGB")
     pipe = _get_caption_pipeline()
-    captions = []
-    for f in image_files:
-        img = Image.open(f).convert("RGB")
-        result = pipe(img)
-        if result and result[0].get("generated_text"):
-            captions.append(result[0]["generated_text"].strip())
-    return captions
-
-
-def _merge_captions(captions: list[str]) -> str:
-    """
-    Combine captions from multiple images into one rich description sentence.
-    Deduplicates words so repeated phrases don't pile up.
-    """
-    if not captions:
-        return ""
-    if len(captions) == 1:
-        return captions[0]
-
-    merged = captions[0].rstrip(".")
-    seen_words = set(captions[0].lower().split())
-
-    for caption in captions[1:]:
-        words = set(caption.lower().split())
-        # Only append if this caption adds at least 2 new meaningful words
-        new_words = words - seen_words
-        meaningful = [w for w in new_words if len(w) > 3]
-        if len(meaningful) >= 2:
-            merged += f"; the back shows {caption.rstrip('.')}" if len(captions) > 1 else f"; {caption.rstrip('.')}"
-            seen_words |= words
-
-    return merged + "."
+    result = pipe(img)
+    return result[0]["generated_text"].strip() if result else ""
 
 
 # ---------------------------------------------------------------------------
@@ -89,30 +58,24 @@ def generate_product_description(
     title: str = "",
     category: str = "",
     condition: str = "",
-    image_captions: list[str] | None = None,
+    image_caption: str = "",
 ) -> tuple[str, list[str]]:
     """
     Build an attractive, naturally-written product description and hashtag list.
-    Uses all image captions to capture details from every photo.
 
     Returns (description, hashtags).
     """
-    if image_captions is None:
-        image_captions = []
-
     kw_list = [k.strip() for k in keywords.split(",") if k.strip()]
     condition_phrase = _CONDITION_PHRASES.get(condition, "in great condition")
     title_lower = title.lower()
 
-    merged_caption = _merge_captions(image_captions)
-
     # --- Paragraph 1: visual hook ---
-    if title and merged_caption:
-        opening = f"{title} — {merged_caption.rstrip('.')}."
+    if title and image_caption:
+        opening = f"{title} — {image_caption.rstrip('.')}."
     elif title:
         opening = f"{title}."
-    elif merged_caption:
-        opening = merged_caption.capitalize()
+    elif image_caption:
+        opening = image_caption.capitalize().rstrip(".") + "."
     else:
         opening = ""
 
@@ -143,13 +106,11 @@ def generate_product_description(
     # --- Hashtags ---
     hashtag_pool: list[str] = []
 
-    # Keywords that aren't already in the title
     title_words = set(title_lower.split())
     for k in kw_list:
         if k.lower() not in title_words:
             hashtag_pool.append(k)
 
-    # Individual words from the title
     for word in title.split():
         if len(word) > 3:
             hashtag_pool.append(word)
@@ -157,10 +118,9 @@ def generate_product_description(
     if category:
         hashtag_pool.append(category.replace(" ", ""))
 
-    # Meaningful words from all image captions
-    stop = {"a", "an", "the", "of", "in", "on", "with", "and", "is", "are", "its", "some", "back", "also", "shows"}
-    for caption in image_captions:
-        for w in caption.lower().split():
+    if image_caption:
+        stop = {"a", "an", "the", "of", "in", "on", "with", "and", "is", "are", "its", "some"}
+        for w in image_caption.lower().split():
             w = w.strip(".,;")
             if len(w) > 3 and w not in stop:
                 hashtag_pool.append(w)
@@ -176,3 +136,43 @@ def generate_product_description(
             hashtags.append(f"#{clean}")
 
     return description, hashtags[:15]
+
+
+# ---------------------------------------------------------------------------
+# Recommendation agent — TF-IDF cosine similarity
+# ---------------------------------------------------------------------------
+
+def get_recommendations(product, queryset, top_n: int = 6) -> list:
+    """
+    Return the top_n products from queryset most similar to product.
+
+    Similarity is computed via TF-IDF on a combined text field
+    (title + brand + category + description). No GPU, no model downloads.
+    """
+    from sklearn.feature_extraction.text import TfidfVectorizer
+    from sklearn.metrics.pairwise import cosine_similarity
+
+    def build_text(p):
+        parts = [
+            p.title or "",
+            p.brand or "",
+            p.category.name if p.category else "",
+            (p.description or "")[:500],
+        ]
+        return " ".join(parts).lower()
+
+    products = list(queryset)
+    if not products:
+        return []
+
+    corpus = [build_text(product)] + [build_text(p) for p in products]
+
+    vectorizer = TfidfVectorizer(stop_words=None, max_features=1000)
+    try:
+        tfidf_matrix = vectorizer.fit_transform(corpus)
+    except ValueError:
+        return products[:top_n]
+
+    scores = cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:]).flatten()
+    ranked_indices = scores.argsort()[::-1]
+    return [products[i] for i in ranked_indices[:top_n]]
