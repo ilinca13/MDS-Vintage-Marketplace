@@ -28,6 +28,9 @@ export default function EditProductPage() {
   const [loading, setLoading] = useState(false)
   const [pageLoading, setPageLoading] = useState(true)
 
+  const [aiLoading, setAiLoading] = useState(false)
+  const [aiHashtags, setAiHashtags] = useState([])
+
   useEffect(() => {
     Promise.all([
       api.get(`/products/${id}/`),
@@ -84,6 +87,50 @@ export default function EditProductPage() {
     } catch {
       setErrors((er) => ({ ...er, images: 'Nu s-a putut șterge imaginea.' }))
     }
+  }
+
+  const generateWithAI = async () => {
+    if (!form.title && !form.brand && existingImages.length === 0 && newImages.length === 0) {
+      setErrors((er) => ({ ...er, description: ['Completează cel puțin titlul sau adaugă o imagine înainte de a genera.'] }))
+      return
+    }
+    setAiLoading(true)
+    setAiHashtags([])
+    setErrors((er) => ({ ...er, description: undefined }))
+    try {
+      const fd = new FormData()
+      if (form.title) fd.append('title', form.title)
+      if (form.brand) fd.append('keywords', form.brand)
+      if (form.condition) fd.append('condition', form.condition)
+      const catName = categories.find((c) => String(c.id) === String(form.category))?.name || ''
+      if (catName) fd.append('category', catName)
+
+      // Prefer a newly uploaded file; fall back to fetching the first existing image
+      if (newImages[0]) {
+        fd.append('image', newImages[0])
+      } else if (existingImages[0]?.image) {
+        const resp = await fetch(existingImages[0].image)
+        const blob = await resp.blob()
+        fd.append('image', blob, 'product.jpg')
+      }
+
+      const { data } = await api.post('/ai/generate-description/', fd, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
+      setForm((f) => ({ ...f, description: data.description }))
+      setAiHashtags(data.hashtags)
+    } catch {
+      setErrors((er) => ({ ...er, description: ['Nu s-a putut genera descrierea. Încearcă din nou.'] }))
+    } finally {
+      setAiLoading(false)
+    }
+  }
+
+  const appendHashtag = (tag) => {
+    setForm((f) => ({
+      ...f,
+      description: f.description ? `${f.description}\n${tag}` : tag,
+    }))
   }
 
   const handleSubmit = async (e) => {
@@ -170,7 +217,6 @@ export default function EditProductPage() {
             </div>
           )}
 
-          {/* New images to add */}
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Adaugă fotografii noi <span className="text-gray-400 font-normal">({existingImages.length + newImages.length}/8)</span>
           </label>
@@ -216,13 +262,56 @@ export default function EditProductPage() {
 
         {/* Description */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Descriere *</label>
+          <div className="flex items-center justify-between mb-1">
+            <label className="block text-sm font-medium text-gray-700">Descriere *</label>
+            <button
+              type="button"
+              onClick={generateWithAI}
+              disabled={aiLoading}
+              className="flex items-center gap-1.5 text-xs font-medium text-brand-600 hover:text-brand-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+            >
+              {aiLoading ? (
+                <>
+                  <svg className="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                  </svg>
+                  Se generează...
+                </>
+              ) : (
+                <>
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  Generează cu AI
+                </>
+              )}
+            </button>
+          </div>
           <textarea
             name="description" required value={form.description} onChange={handleChange}
             rows={4}
             className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 resize-none"
           />
           {fieldErr('description')}
+
+          {aiHashtags.length > 0 && (
+            <div className="mt-2">
+              <p className="text-xs text-gray-500 mb-1.5">Hashtag-uri sugerate — click pentru a adăuga în descriere:</p>
+              <div className="flex flex-wrap gap-1.5">
+                {aiHashtags.map((tag) => (
+                  <button
+                    key={tag}
+                    type="button"
+                    onClick={() => appendHashtag(tag)}
+                    className="text-xs bg-brand-50 text-brand-600 hover:bg-brand-100 border border-brand-200 rounded-full px-2.5 py-0.5 transition"
+                  >
+                    {tag}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Price + Category */}

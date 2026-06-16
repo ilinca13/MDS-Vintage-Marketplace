@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'reviews',
     'wishlist',
     'django_extensions',
+    'ai_agent',
 ]
 
 MIDDLEWARE = [

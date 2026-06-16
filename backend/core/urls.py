@@ -11,6 +11,7 @@ urlpatterns = [
     path('api/', include('orders.urls')),
     path('api/', include('reviews.urls')),
     path('api/', include('messaging.urls')),
+    path('api/', include('ai_agent.urls')),
 ]
 
 if settings.DEBUG:
