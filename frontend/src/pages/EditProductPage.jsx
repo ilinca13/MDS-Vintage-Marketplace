@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import api from '../api/axios'
+import EXTRA_CATEGORIES from '../config/categories'
 import { useAuth } from '../context/AuthContext'
 
 const CONDITIONS = [
@@ -42,14 +43,15 @@ export default function EditProductPage() {
         title:       product.title,
         description: product.description,
         price:       product.price,
-        category:    product.category?.id || '',
+        category:    product.category?.id ? String(product.category.id) : '',
         condition:   product.condition,
         size:        product.size || '',
         brand:       product.brand || '',
         location:    product.location || '',
       })
       setExistingImages(product.images || [])
-      setCategories(cats)
+      const normalized = cats.map((c) => ({ ...c, id: String(c.id) }))
+      setCategories(normalized)
     }).finally(() => setPageLoading(false))
   }, [id, user, navigate])
 
@@ -94,11 +96,18 @@ export default function EditProductPage() {
     setLoading(true)
     setErrors({})
     try {
-      await api.patch(`/products/${id}/`, {
-        ...form,
-        price: parseFloat(form.price),
-        category: form.category || null,
-      })
+        // If user selected a client-side-only category, omit the `category` field
+        // so the backend keeps the existing category. Otherwise include numeric id or null.
+        const isExtra = EXTRA_CATEGORIES.some((c) => c.id === form.category)
+        const payload = { ...form, price: parseFloat(form.price) }
+        if (!isExtra) {
+          payload.category = form.category ? Number(form.category) : null
+        } else {
+          // ensure we don't send the client-side id
+          delete payload.category
+        }
+
+        await api.patch(`/products/${id}/`, payload)
 
       // Navigate immediately so the edit page unmounts and user can't resubmit.
       navigate(`/products/${id}`)

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import api from '../api/axios'
 import ProductCard from '../components/product/ProductCard'
 import SortDropdown from '../components/common/SortDropdown'
+import EXTRA_CATEGORIES from '../config/categories'
 
 const SORT_OPTIONS = [
   { value: '-created_at', label: 'Cele mai recente' },
@@ -41,7 +42,10 @@ export default function WishlistPage() {
   const totalPages = Math.ceil(total / PAGE_SIZE)
 
   useEffect(() => {
-    api.get('/categories/').then(({ data }) => setCategories(data))
+    api.get('/categories/').then(({ data }) => {
+      const normalized = data.map((c) => ({ ...c, id: String(c.id) }))
+      setCategories(normalized)
+    })
   }, [])
 
   useEffect(() => {

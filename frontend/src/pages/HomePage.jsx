@@ -4,6 +4,7 @@ import api from '../api/axios'
 import FilterSidebar from '../components/product/FilterSidebar'
 import SortDropdown from '../components/common/SortDropdown'
 import ProductCard from '../components/product/ProductCard'
+import EXTRA_CATEGORIES from '../config/categories'
 
 const DEFAULT_FILTERS = {
   search: '',
@@ -38,7 +39,10 @@ export default function HomePage() {
   const totalPages = Math.ceil(total / PAGE_SIZE)
 
   useEffect(() => {
-    api.get('/categories/').then(({ data }) => setCategories(data))
+    api.get('/categories/').then(({ data }) => {
+      const normalized = data.map((c) => ({ ...c, id: String(c.id) }))
+      setCategories(normalized)
+    })
   }, [])
 
   useEffect(() => {

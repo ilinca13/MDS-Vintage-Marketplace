@@ -11,7 +11,7 @@ export default function Navbar() {
   }
 
   return (
-    <header className="bg-pink-100 border-b border-pink-300 sticky top-0 z-50">
+    <header className="bg-pink-200 border-b border-pink-300 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 h-16 flex items-center gap-4">
 
         {/* Logo */}
@@ -82,7 +82,7 @@ export default function Navbar() {
                 onClick={handleLogout}
                 className="text-sm text-gray-500 hover:text-red-500 transition"
               >
-                Ieși
+                Ieși din cont
               </button>
             </>
           ) : (
