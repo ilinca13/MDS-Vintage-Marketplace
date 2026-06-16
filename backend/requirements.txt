@@ -10,3 +10,9 @@ django-filter==24.3
 django-extensions
 pyparsing
 pydot
+# model AI — image-to-text via BLIP (Salesforce/blip-image-captioning-base)
+numpy<2
+torch==2.2.2
+torchvision==0.17.2
+transformers==4.40.2
+accelerate==0.29.3
