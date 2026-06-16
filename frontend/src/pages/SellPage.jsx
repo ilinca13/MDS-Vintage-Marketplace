@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api from '../api/axios'
+import EXTRA_CATEGORIES from '../config/categories'
 
 const CONDITIONS = [
   { value: 'new',      label: 'Nou cu etichete' },
@@ -28,7 +29,10 @@ export default function SellPage() {
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    api.get('/categories/').then(({ data }) => setCategories(data))
+    api.get('/categories/').then(({ data }) => {
+      const normalized = data.map((c) => ({ ...c, id: String(c.id) }))
+      setCategories(normalized)
+    })
   }, [])
 
   const handleChange = (e) => {
@@ -66,7 +70,8 @@ export default function SellPage() {
       const { data: product } = await api.post('/products/', {
         ...form,
         price: parseFloat(form.price),
-        category: form.category || null,
+        // If user picked a client-side-only category (one of EXTRA_CATEGORIES), send null
+        category: EXTRA_CATEGORIES.some((c) => c.id === form.category) ? null : (form.category ? Number(form.category) : null),
       })
 
       // Navigate to main page immediately so the create page unmounts and user can't repost.
