@@ -16,3 +16,5 @@ torch==2.2.2
 torchvision==0.17.2
 transformers==4.40.2
 accelerate==0.29.3
+# recommendation agent — TF-IDF cosine similarity
+scikit-learn==1.4.2
