@@ -105,7 +105,7 @@ export default function WishlistPage() {
             placeholder="Caută în favorite..."
             value={filters.search}
             onChange={(e) => handleFilter('search', e.target.value)}
-            className="border border-gray-300 rounded-lg px-3 py-2 text-sm w-48 focus:outline-none focus:ring-2 focus:ring-brand-400"
+            className="border border-gray-300 rounded-lg px-3 py-2 text-sm w-48 focus:outline-none focus:ring-2 focus:ring-brand-400 font-yanone"
           />
           <select
             value={filters.ordering}

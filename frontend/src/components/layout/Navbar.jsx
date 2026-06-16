@@ -15,8 +15,8 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 h-16 flex items-center gap-4">
 
         {/* Logo */}
-        <Link to="/" className="text-xl font-bold text-brand-600 shrink-0">
-          Vintage
+        <Link to="/" className="text-xl font-bold text-brand-600 shrink-0 font-righteous">
+          HolyGrail
         </Link>
 
         {/* Search */}
@@ -32,7 +32,7 @@ export default function Navbar() {
             name="q"
             type="search"
             placeholder="Caută produse, branduri..."
-            className="w-full border border-gray-300 rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
+            className="w-full border border-gray-300 rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 font-yanone"
           />
         </form>
 

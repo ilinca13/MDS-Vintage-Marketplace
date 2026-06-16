@@ -33,7 +33,7 @@ export default function LoginPage() {
       <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 w-full max-w-md">
 
         <h1 className="text-2xl font-bold text-gray-900 mb-1">Bine ai revenit!</h1>
-        <p className="text-gray-500 text-sm mb-6">Intră în contul tău Vintage Marketplace.</p>
+        <p className="text-gray-500 text-sm mb-6">Intră în contul tău HolyGrail.</p>
 
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3 mb-4">
