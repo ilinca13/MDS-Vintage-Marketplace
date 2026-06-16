@@ -39,13 +39,17 @@ _VINTAGE_HASHTAGS = [
     "retro", "vintagestyle",
 ]
 
-_CONDITION_LABELS = {
-    "new": "brand new with original tags",
-    "like_new": "in like-new condition — barely worn",
-    "good": "in great condition with minimal signs of wear",
+_CONDITION_PHRASES = {
+    "new": "brand new with original tags — never worn",
+    "like_new": "in like-new condition — barely worn with no signs of use",
+    "good": "in great condition — minimal signs of wear, well cared for",
     "fair": "in fair condition — some visible wear that adds character",
-    "poor": "well-loved with clear signs of use",
+    "poor": "well-loved with clear signs of a life well lived",
 }
+
+
+def _slug(text: str) -> str:
+    return text.lower().replace(" ", "").replace("-", "")
 
 
 def generate_product_description(
@@ -57,65 +61,82 @@ def generate_product_description(
     image_caption: str = "",
 ) -> tuple[str, list[str]]:
     """
-    Build an attractive product description and hashtag list from available context.
+    Build an attractive, naturally-written product description and hashtag list.
 
     Returns (description, hashtags).
     """
     kw_list = [k.strip() for k in keywords.split(",") if k.strip()]
-    condition_text = _CONDITION_LABELS.get(condition, "in great condition")
+    condition_phrase = _CONDITION_PHRASES.get(condition, "in great condition")
+    title_lower = title.lower()
 
-    # --- Description body ---
-    lines: list[str] = []
-
-    # Opening line: combine title and image caption
+    # --- Paragraph 1: visual hook ---
     if title and image_caption:
-        lines.append(f"{title} — {image_caption.rstrip('.')}.")
+        caption_clean = image_caption.strip().rstrip(".")
+        opening = f"{title} — {caption_clean}."
     elif title:
-        lines.append(f"{title}.")
+        opening = f"{title}."
     elif image_caption:
-        lines.append(f"{image_caption.capitalize().rstrip('.')}.")
+        opening = image_caption.strip().rstrip(".").capitalize() + "."
+    else:
+        opening = ""
 
-    # Category + condition sentence
-    if category:
-        lines.append(
-            f"A wonderful vintage piece from the {category} category, {condition_text}."
+    # --- Paragraph 2: condition + context ---
+    # Only mention keywords that aren't already obvious from the title
+    extra_kws = [k for k in kw_list if k.lower() not in title_lower]
+
+    if category and extra_kws:
+        body = (
+            f"A one-of-a-kind {category.lower()} piece, {condition_phrase}. "
+            f"Features worth noting: {', '.join(extra_kws)}."
+        )
+    elif category:
+        body = f"A one-of-a-kind {category.lower()} piece, {condition_phrase}."
+    elif extra_kws:
+        body = (
+            f"A unique vintage find, {condition_phrase}. "
+            f"Features worth noting: {', '.join(extra_kws)}."
         )
     else:
-        lines.append(
-            f"This beautiful vintage item is {condition_text} and ready for a new home."
-        )
+        body = f"A unique vintage find, {condition_phrase}."
 
-    # Keyword features
-    if kw_list:
-        lines.append(f"Key features: {', '.join(kw_list)}.")
+    # --- Paragraph 3: closing ---
+    closing = "Ships carefully packaged — sustainable fashion, one piece at a time."
 
-    # Sustainability pitch
-    lines.append("Sustainably sourced from a curated vintage collection.")
-    lines.append("Carefully packaged and shipped with love.")
-
-    description = " ".join(lines)
+    paragraphs = [p for p in [opening, body, closing] if p]
+    description = "\n\n".join(paragraphs)
 
     # --- Hashtags ---
-    hashtag_pool: list[str] = list(kw_list)
+    hashtag_pool: list[str] = []
 
+    # Keywords first (deduplicated against title words)
+    title_words = set(title_lower.split())
+    for k in kw_list:
+        if k.lower() not in title_words:
+            hashtag_pool.append(k)
+
+    # Individual words from the title (skip very short words)
+    for word in title.split():
+        if len(word) > 3:
+            hashtag_pool.append(word)
+
+    # Category
     if category:
         hashtag_pool.append(category.replace(" ", ""))
 
-    # Pull meaningful words from the image caption
+    # Meaningful words from image caption
     if image_caption:
-        stop = {"a", "an", "the", "of", "in", "on", "with", "and", "is", "are"}
-        caption_words = [
-            w.strip(".,") for w in image_caption.lower().split()
-            if len(w) > 3 and w.strip(".,") not in stop
-        ]
-        hashtag_pool.extend(caption_words[:4])
+        stop = {"a", "an", "the", "of", "in", "on", "with", "and", "is", "are", "its", "some"}
+        for w in image_caption.lower().split():
+            w = w.strip(".,")
+            if len(w) > 3 and w not in stop:
+                hashtag_pool.append(w)
 
     hashtag_pool.extend(_VINTAGE_HASHTAGS)
 
     seen: set[str] = set()
     hashtags: list[str] = []
     for tag in hashtag_pool:
-        clean = tag.lower().replace(" ", "").replace("-", "")
+        clean = _slug(tag)
         if clean and clean not in seen:
             seen.add(clean)
             hashtags.append(f"#{clean}")
