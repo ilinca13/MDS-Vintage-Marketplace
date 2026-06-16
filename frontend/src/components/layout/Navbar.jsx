@@ -66,8 +66,12 @@ export default function Navbar() {
               </Link>
 
               <Link to="/profile" className="flex items-center gap-1 text-gray-700 hover:text-brand-600 transition font-medium">
-                <div className="w-8 h-8 rounded-full bg-brand-100 flex items-center justify-center text-brand-700 font-bold text-sm">
-                  {user.username[0].toUpperCase()}
+                <div className="w-8 h-8 rounded-full bg-brand-100 flex items-center justify-center text-brand-700 font-bold text-sm overflow-hidden">
+                  {(user.avatar_url || user.avatar) ? (
+                    <img src={user.avatar_url || user.avatar} alt={user.username} className="w-full h-full object-cover" />
+                  ) : (
+                    user.username ? user.username[0].toUpperCase() : ''
+                  )}
                 </div>
               </Link>
 
