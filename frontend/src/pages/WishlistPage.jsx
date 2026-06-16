@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import api from '../api/axios'
 import ProductCard from '../components/product/ProductCard'
+import SortDropdown from '../components/common/SortDropdown'
 
 const SORT_OPTIONS = [
   { value: '-created_at', label: 'Cele mai recente' },
@@ -122,7 +123,7 @@ export default function WishlistPage() {
           <div className="flex items-center justify-between">
             <span className="text-sm font-semibold text-gray-700">Filtre</span>
             {activeFiltersCount > 0 && (
-              <button onClick={handleReset} className="text-xs text-pink-700 bg-pink-100 border-2 border-pink-300 rounded px-2 py-0.5 hover:bg-pink-200 transition focus:outline-none focus:ring-2 focus:ring-pink-200">
+              <button onClick={handleReset} className="text-xs text-pink-700 bg-pink-100 border-4 border-pink-300 rounded-xl px-2 py-0.5 hover:bg-pink-200 transition focus:outline-none focus:ring-2 focus:ring-pink-200">
                 Resetează ({activeFiltersCount})
               </button>
             )}
@@ -208,7 +209,7 @@ export default function WishlistPage() {
                 {activeFiltersCount > 0 ? 'Niciun produs cu filtrele selectate' : 'Lista de favorite e goală'}
               </p>
               {activeFiltersCount > 0 ? (
-                <button onClick={handleReset} className="mt-3 text-sm text-pink-700 bg-pink-100 border-2 border-pink-300 rounded-md px-3 py-1 hover:bg-pink-200 transition focus:outline-none focus:ring-2 focus:ring-pink-200">
+                <button onClick={handleReset} className="mt-3 text-sm text-pink-700 bg-pink-100 border-4 border-pink-300 rounded-xl px-3 py-1 hover:bg-pink-200 transition focus:outline-none focus:ring-2 focus:ring-pink-200">
                   Resetează filtrele
                 </button>
               ) : (

@@ -18,6 +18,7 @@ export default function EditProductPage() {
   const { user } = useAuth()
   const navigate = useNavigate()
   const fileInputRef = useRef()
+  const submittingRef = useRef(false)
 
   const [categories, setCategories] = useState([])
   const [existingImages, setExistingImages] = useState([])
@@ -88,6 +89,8 @@ export default function EditProductPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    if (submittingRef.current) return
+    submittingRef.current = true
     setLoading(true)
     setErrors({})
     try {
@@ -97,21 +100,30 @@ export default function EditProductPage() {
         category: form.category || null,
       })
 
-      for (let i = 0; i < newImages.length; i++) {
-        const fd = new FormData()
-        fd.append('image', newImages[i])
-        fd.append('is_primary', existingImages.length === 0 && i === 0 ? 'true' : 'false')
-        fd.append('order', existingImages.length + i)
-        await api.post(`/products/${id}/images/`, fd, {
-          headers: { 'Content-Type': 'multipart/form-data' },
-        })
-      }
-
+      // Navigate immediately so the edit page unmounts and user can't resubmit.
       navigate(`/products/${id}`)
+
+      // Upload new images in background; swallow errors.
+      ;(async () => {
+        for (let i = 0; i < newImages.length; i++) {
+          try {
+            const fd = new FormData()
+            fd.append('image', newImages[i])
+            fd.append('is_primary', existingImages.length === 0 && i === 0 ? 'true' : 'false')
+            fd.append('order', existingImages.length + i)
+            await api.post(`/products/${id}/images/`, fd, {
+              headers: { 'Content-Type': 'multipart/form-data' },
+            })
+          } catch (e) {
+            // ignore
+          }
+        }
+      })()
     } catch (err) {
       setErrors(err.response?.data || { non_field_errors: ['A apărut o eroare.'] })
     } finally {
       setLoading(false)
+      submittingRef.current = false
     }
   }
 
