@@ -107,14 +107,11 @@ export default function SellPage() {
       const { data: product } = await api.post('/products/', {
         ...form,
         price: parseFloat(form.price),
-        // If user picked a client-side-only category (one of EXTRA_CATEGORIES), send null
         category: EXTRA_CATEGORIES.some((c) => c.id === form.category) ? null : (form.category ? Number(form.category) : null),
       })
 
-      // Navigate to main page immediately so the create page unmounts and user can't repost.
       navigate('/')
 
-      // Upload images in background (fire-and-forget). Errors are swallowed.
       ;(async () => {
         for (let i = 0; i < images.length; i++) {
           try {
@@ -126,7 +123,6 @@ export default function SellPage() {
               headers: { 'Content-Type': 'multipart/form-data' },
             })
           } catch (e) {
-            // ignore upload errors — product page is shown regardless
           }
         }
       })()
@@ -147,7 +143,7 @@ export default function SellPage() {
 
       <form onSubmit={handleSubmit} className="space-y-6">
 
-        {/* Images */}
+        {/* Imagini */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Fotografii <span className="text-gray-400 font-normal">(maxim 8, prima va fi cea principală)</span>
@@ -195,7 +191,7 @@ export default function SellPage() {
           {errors.images && <p className="text-red-500 text-xs mt-1">{errors.images}</p>}
         </div>
 
-        {/* Title */}
+        {/* Titlu */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Titlu *</label>
           <input
@@ -206,7 +202,7 @@ export default function SellPage() {
           {fieldErr('title')}
         </div>
 
-        {/* Description */}
+        {/* Descriere */}
         <div>
           <div className="flex items-center justify-between mb-1">
             <label className="block text-sm font-medium text-gray-700">Descriere *</label>
@@ -260,7 +256,7 @@ export default function SellPage() {
           )}
         </div>
 
-        {/* Price + Category */}
+        {/* Pret si categorie */}
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Preț (RON) *</label>
@@ -286,7 +282,7 @@ export default function SellPage() {
           </div>
         </div>
 
-        {/* Condition + Size */}
+        {/* Conditie si marime */}
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Stare *</label>
@@ -311,7 +307,7 @@ export default function SellPage() {
           </div>
         </div>
 
-        {/* Brand + Location */}
+        {/* Brand si locatie */}
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Brand</label>

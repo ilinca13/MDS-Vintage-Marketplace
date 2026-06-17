@@ -100,7 +100,7 @@ export default function PublicProfilePage() {
   return (
     <div className="max-w-4xl mx-auto space-y-8">
 
-      {/* Profile header */}
+      {/* Header profil */}
       <div className="bg-white rounded-2xl border border-gray-200 p-6 flex gap-5 items-center">
         <div className="w-20 h-20 rounded-full bg-brand-100 flex items-center justify-center overflow-hidden shrink-0">
           {(profile.avatar_url || profile.avatar) ? (
@@ -136,7 +136,7 @@ export default function PublicProfilePage() {
         </div>
       </div>
 
-      {/* Tabs */}
+      {/* Taburi */}
       <div>
         <div className="flex border-b border-gray-200 mb-6">
           {TABS.map((t) => (

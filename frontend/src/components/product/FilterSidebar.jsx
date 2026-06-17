@@ -12,7 +12,7 @@ export default function FilterSidebar({ filters, onChange, categories }) {
   return (
     <aside className="w-56 shrink-0 space-y-6">
 
-      {/* Category */}
+      {/* Categorie */}
       <div>
         <h3 className="text-sm font-semibold text-gray-700 mb-2">Categorie</h3>
         <ul className="space-y-1">
@@ -37,7 +37,7 @@ export default function FilterSidebar({ filters, onChange, categories }) {
         </ul>
       </div>
 
-      {/* Price */}
+      {/* Pret */}
       <div>
         <h3 className="text-sm font-semibold text-gray-700 mb-2">Preț (RON)</h3>
         <div className="flex gap-2">
@@ -60,7 +60,7 @@ export default function FilterSidebar({ filters, onChange, categories }) {
         </div>
       </div>
 
-      {/* Condition */}
+      {/* Conditie */}
       <div>
         <h3 className="text-sm font-semibold text-gray-700 mb-2">Stare</h3>
         <ul className="space-y-1">
