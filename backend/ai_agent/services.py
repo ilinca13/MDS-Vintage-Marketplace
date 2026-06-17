@@ -139,6 +139,57 @@ def generate_product_description(
 
 
 # ---------------------------------------------------------------------------
+# Image flagging agent — OCR watermark detection
+# ---------------------------------------------------------------------------
+
+_SUSPICIOUS_BRANDS = ['shein', 'temu', 'romwe', 'zaful', 'aliexpress', 'dhgate', 'shein.com', 'temu.com']
+
+
+def check_image_source(image_file) -> dict:
+    """
+    Detect fast-fashion watermarks in the image using OCR (pytesseract).
+    Returns {'flagged': bool, 'reason': str | None, 'matches': list}
+
+    Agent logic:
+    1. Open image with PIL
+    2. Extract all text via OCR
+    3. Check extracted text against known fast-fashion brand names
+    4. Return verdict with detected brand
+    """
+    import io
+    import pytesseract
+    from PIL import Image
+
+    try:
+        image_bytes = image_file.read()
+        image_file.seek(0)
+
+        img = Image.open(io.BytesIO(image_bytes)).convert('RGB')
+
+        # Run OCR — extract all visible text
+        text = pytesseract.image_to_string(img).lower()
+        print(f"[FLAG AGENT] OCR text detected: {text[:300]}")
+
+        # Agent decision: check for brand names in extracted text
+        for brand in _SUSPICIOUS_BRANDS:
+            if brand in text:
+                detected = brand.replace('.com', '').upper()
+                print(f"[FLAG AGENT] Flagged — detected brand: {detected}")
+                return {
+                    'flagged': True,
+                    'reason': f'Watermark {detected} detectat în imagine. Te rugăm să folosești fotografii proprii.',
+                    'matches': [],
+                }
+
+        print("[FLAG AGENT] Not flagged")
+        return {'flagged': False, 'reason': None, 'matches': []}
+
+    except Exception as e:
+        print(f"[FLAG AGENT] Exception: {e}")
+        return {'flagged': False, 'reason': None, 'matches': []}
+
+
+# ---------------------------------------------------------------------------
 # Recommendation agent — TF-IDF cosine similarity
 # ---------------------------------------------------------------------------
 

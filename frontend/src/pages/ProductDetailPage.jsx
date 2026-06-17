@@ -17,6 +17,27 @@ const STATUS_LABEL = {
   sold: { text: 'Vândut', color: 'bg-red-100 text-red-700' },
 }
 
+function DescriptionWithTags({ text }) {
+  const parts = text.split(/(#\w+)/g)
+  return (
+    <>
+      {parts.map((part, i) =>
+        part.startsWith('#') ? (
+          <Link
+            key={i}
+            to={`/?search=${encodeURIComponent(part)}`}
+            className="text-brand-500 hover:text-brand-700 hover:underline font-medium"
+          >
+            {part}
+          </Link>
+        ) : (
+          <span key={i}>{part}</span>
+        )
+      )}
+    </>
+  )
+}
+
 function StarScore({ label, value }) {
   if (value === null) return null
   return (
@@ -186,6 +207,18 @@ export default function ProductDetailPage() {
           {statusInfo.text}
         </span>
 
+        {/* Fast fashion warning */}
+        {product.is_flagged && (
+          <div className="flex items-start gap-2 bg-orange-50 border border-orange-200 rounded-xl px-4 py-3">
+            <svg className="w-4 h-4 text-orange-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+            </svg>
+            <p className="text-xs text-orange-700">
+              <span className="font-semibold">Articol posibil fast fashion.</span> Imaginea acestui produs a fost identificată pe un site de tip Shein sau Temu.
+            </p>
+          </div>
+        )}
+
         <h1 className="text-2xl font-bold text-gray-900">{product.title}</h1>
         <p className="text-3xl font-bold text-brand-600">{product.price} RON</p>
 
@@ -202,7 +235,9 @@ export default function ProductDetailPage() {
         {product.description && (
           <div className="border-t border-gray-100 pt-4">
             <p className="text-sm font-medium text-gray-700 mb-1">Descriere</p>
-            <p className="text-sm text-gray-600 whitespace-pre-line">{product.description}</p>
+            <p className="text-sm text-gray-600 whitespace-pre-line">
+              <DescriptionWithTags text={product.description} />
+            </p>
           </div>
         )}
 

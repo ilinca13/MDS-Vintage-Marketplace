@@ -32,6 +32,8 @@ export default function EditProductPage() {
 
   const [aiLoading, setAiLoading] = useState(false)
   const [aiHashtags, setAiHashtags] = useState([])
+  const [flagWarning, setFlagWarning] = useState('')
+  const [isFlagged, setIsFlagged] = useState(false)
 
   useEffect(() => {
     Promise.all([
@@ -63,7 +65,7 @@ export default function EditProductPage() {
     setErrors((er) => ({ ...er, [e.target.name]: undefined }))
   }
 
-  const handleNewImages = (e) => {
+  const handleNewImages = async (e) => {
     const files = Array.from(e.target.files)
     const total = existingImages.length + newImages.length + files.length
     if (total > 8) {
@@ -73,6 +75,20 @@ export default function EditProductPage() {
     setNewImages((p) => [...p, ...files])
     setNewPreviews((p) => [...p, ...files.map((f) => URL.createObjectURL(f))])
     setErrors((er) => ({ ...er, images: undefined }))
+    setFlagWarning('')
+
+    // Check first new image against Shein/Temu
+    if (files[0]) {
+      try {
+        const fd = new FormData()
+        fd.append('image', files[0])
+        const { data } = await api.post('/ai/flag-image/', fd, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        })
+        if (data.flagged) { setFlagWarning(data.reason); setIsFlagged(true) }
+        else { setFlagWarning(''); setIsFlagged(false) }
+      } catch { /* silent — flagging is non-blocking */ }
+    }
   }
 
   const removeNewImage = (i) => {
@@ -108,17 +124,12 @@ export default function EditProductPage() {
       const catName = categories.find((c) => String(c.id) === String(form.category))?.name || ''
       if (catName) fd.append('category', catName)
 
-      newImages.forEach((img) => fd.append('images', img))
-
-      if (existingImages.length > 0) {
-        const fetched = await Promise.all(
-          existingImages.map(async (img, i) => {
-            const resp = await fetch(img.image)
-            const blob = await resp.blob()
-            return { blob, name: `existing_${i}.jpg` }
-          })
-        )
-        fetched.forEach(({ blob, name }) => fd.append('images', blob, name))
+      if (newImages[0]) {
+        fd.append('image', newImages[0])
+      } else if (existingImages[0]?.image) {
+        const resp = await fetch(existingImages[0].image)
+        const blob = await resp.blob()
+        fd.append('image', blob, 'product.jpg')
       }
 
       const { data } = await api.post('/ai/generate-description/', fd, {
@@ -148,7 +159,7 @@ export default function EditProductPage() {
     setErrors({})
     try {
         const isExtra = EXTRA_CATEGORIES.some((c) => c.id === form.category)
-        const payload = { ...form, price: parseFloat(form.price) }
+        const payload = { ...form, price: parseFloat(form.price), is_flagged: isFlagged }
         if (!isExtra) {
           payload.category = form.category ? Number(form.category) : null
         } else {
@@ -267,6 +278,17 @@ export default function EditProductPage() {
           </div>
           <input ref={fileInputRef} type="file" accept="image/*" multiple className="hidden" onChange={handleNewImages} />
           {errors.images && <p className="text-red-500 text-xs mt-1">{errors.images}</p>}
+          {flagWarning && (
+            <div className="mt-3 flex items-start gap-2 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+              <svg className="w-5 h-5 text-red-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+              </svg>
+              <div>
+                <p className="text-sm font-semibold text-red-700">Imagine suspectă detectată</p>
+                <p className="text-xs text-red-600 mt-0.5">{flagWarning}</p>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Titlu*/}

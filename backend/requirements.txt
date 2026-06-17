@@ -18,3 +18,5 @@ transformers==4.40.2
 accelerate==0.29.3
 # recommendation agent — TF-IDF cosine similarity
 scikit-learn==1.4.2
+# image flagging agent — OCR watermark detection
+pytesseract==0.3.13
