@@ -34,7 +34,6 @@ This repository was built using a **Django REST Framework** backend, a **React (
 - [API Reference](#api-reference)
 - [Development Timeline](#development-timeline)
 - [Testing](#testing)
-- [Project Structure](#project-structure)
 - [Roadmap and Future Improvements](#roadmap-and-future-improvements)
 
 
@@ -367,29 +366,6 @@ curl -X POST http://localhost:8000/api/wishlist/toggle/ \
 
 Frontend flows (registration, login, listing creation, wishlist toggling, checkout, messaging, and the AI-assisted description and recommendation features) were validated manually across desktop and mobile viewport sizes.
 
-## Project Structure
-
-```
-.
-├── backend/
-│   ├── users/          # Custom user model and profile logic
-│   ├── products/       # Product catalog, categories, images
-│   ├── orders/         # Order placement and status management
-│   ├── reviews/        # Seller reviews and reputation scoring
-│   ├── messaging/      # Conversations and messages
-│   ├── wishlist/       # Wishlist toggle logic
-│   ├── ai_agent/        # AI description, tagging, and recommendation logic
-│   ├── Dockerfile
-│   └── entrypoint.sh
-├── frontend/
-│   ├── src/
-│   │   ├── pages/      # Route-level page components
-│   │   ├── components/ # Reusable UI components
-│   │   └── context/    # Global state (e.g. AuthContext)
-│   └── Dockerfile
-├── docker-compose.yml
-└── .env
-```
 
 ## Roadmap and Future Improvements
 
