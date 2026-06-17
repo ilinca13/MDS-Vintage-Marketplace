@@ -9,7 +9,7 @@ export default function Layout() {
         <Outlet />
       </main>
       <footer className="border-t border-gray-200 text-center text-sm text-gray-400 py-4">
-        © 2026 Vintage Marketplace
+        © 2026 HolyGrail - Vintage Marketplace
       </footer>
     </div>
   )

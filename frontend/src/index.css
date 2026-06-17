@@ -1,9 +1,21 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Yanone+Kaffeesatz:wght@300;400;700&family=Righteous&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   body {
-    @apply bg-gray-50 text-gray-900 antialiased;
+    background: linear-gradient(135deg, #bce8cf 0%, #dff7fb 35%, #c6e6d9 65%, #f0fff9 100%);
+    background-attachment: fixed;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    color-scheme: light;
+    @apply text-gray-900 font-sans;
   }
+}
+
+
+.font-yanone {
+  font-family: 'Yanone Kaffeesatz', 'Poppins', Inter, system-ui, sans-serif;
 }
