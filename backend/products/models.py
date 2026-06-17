@@ -55,6 +55,7 @@ class Product(models.Model):
     brand = models.CharField(max_length=100, blank=True)
     location = models.CharField(max_length=100, blank=True)
     views_count = models.PositiveIntegerField(default=0)
+    is_flagged = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
