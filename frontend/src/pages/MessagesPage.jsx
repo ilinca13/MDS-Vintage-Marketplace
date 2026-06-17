@@ -102,7 +102,7 @@ export default function MessagesPage() {
   return (
     <div className="flex h-[calc(100vh-8rem)] -mx-4 sm:-mx-8 overflow-hidden rounded-2xl border border-gray-200 bg-white">
 
-      {/* ── Left panel: conversation list ── */}
+      {/* Stanga - panel conversatii */}
       <div className={`w-full sm:w-80 shrink-0 border-r border-gray-200 flex flex-col ${mobileView === 'chat' ? 'hidden sm:flex' : 'flex'}`}>
         <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
           <h2 className="font-semibold text-gray-800">
@@ -177,7 +177,7 @@ export default function MessagesPage() {
         </div>
       </div>
 
-      {/* ── Right panel: chat ── */}
+      {/* Dreapta - chat */}
       <div className={`flex-1 flex flex-col min-w-0 ${mobileView === 'list' ? 'hidden sm:flex' : 'flex'}`}>
         {!activeConv && !convLoading ? (
           <div className="flex-1 flex items-center justify-center text-gray-400">
@@ -232,7 +232,7 @@ export default function MessagesPage() {
               </div>
             </div>
 
-            {/* Messages */}
+            {/* Mesaje */}
             <div className="flex-1 overflow-y-auto px-4 py-4 space-y-2">
               {messages.length === 0 ? (
                 <p className="text-center text-sm text-gray-400 py-8">Niciun mesaj. Fii primul care scrie!</p>

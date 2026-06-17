@@ -103,7 +103,7 @@ export default function WishlistPage() {
           )}
         </div>
 
-        {/* Search + sort */}
+        {/* Cautare si sortare */}
         <div className="flex items-center gap-2 flex-wrap">
           <input
             type="search"
@@ -122,7 +122,7 @@ export default function WishlistPage() {
 
       <div className="flex gap-6">
 
-        {/* Filter sidebar */}
+        {/* Sidebar */}
         <aside className="hidden sm:block w-52 shrink-0 space-y-5">
           <div className="flex items-center justify-between">
             <span className="text-sm font-semibold text-gray-700">Filtre</span>
@@ -133,7 +133,7 @@ export default function WishlistPage() {
             )}
           </div>
 
-          {/* Category */}
+          {/* Categorie */}
           <div>
             <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Categorie</p>
             <select
@@ -148,7 +148,7 @@ export default function WishlistPage() {
             </select>
           </div>
 
-          {/* Condition */}
+          {/* Conditii */}
           <div>
             <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Stare</p>
             <div className="space-y-1.5">
@@ -175,7 +175,7 @@ export default function WishlistPage() {
             </div>
           </div>
 
-          {/* Price */}
+          {/* Pret */}
           <div>
             <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Preț (RON)</p>
             <div className="flex items-center gap-2">

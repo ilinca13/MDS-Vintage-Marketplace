@@ -172,7 +172,7 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* Edit toggle */}
+        {/* Edit */}
         <button
           onClick={() => { setEditMode((v) => !v); setSaveSuccess(false) }}
           className="shrink-0 flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 transition"
@@ -256,7 +256,7 @@ export default function ProfilePage() {
         </div>
       )}
 
-      {/* Tabs */}
+      {/* Taburi */}
       <div>
         <div className="flex border-b border-gray-200 mb-6">
           {TABS.map((t) => (
@@ -274,7 +274,7 @@ export default function ProfilePage() {
           ))}
         </div>
 
-        {/* Active / Sold listings */}
+        {/* Active / Anunturi vandute */}
         {(activeTab === 'active' || activeTab === 'sold') && (
           productsLoading ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -299,7 +299,7 @@ export default function ProfilePage() {
           )
         )}
 
-        {/* Reviews */}
+        {/* Recenzii */}
         {activeTab === 'reviews' && (
           reviewsLoading ? (
             <div className="space-y-4">
@@ -325,7 +325,7 @@ export default function ProfilePage() {
                 </div>
               )}
 
-              {/* Individual reviews */}
+              {/* Recenzii individuale */}
               {reviews.length === 0 ? (
                 <div className="text-center py-16 text-gray-400">
                   <p className="font-medium">Nicio recenzie primită încă</p>

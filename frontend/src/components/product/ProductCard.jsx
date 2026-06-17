@@ -14,7 +14,7 @@ export default function ProductCard({ product }) {
       to={`/products/${product.id}`}
       className="group bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
     >
-      {/* Image */}
+      {/* Imagine */}
       <div className="aspect-square bg-gray-100 overflow-hidden">
         {product.primary_image ? (
           <img

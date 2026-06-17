@@ -76,7 +76,7 @@ function OrderCard({ order, isSeller, onStatusChange }) {
   return (
     <div className="bg-white rounded-2xl border border-gray-200 p-5">
       <div className="flex gap-4">
-        {/* Product image */}
+        {/* Imaginea produsului */}
         <Link to={`/products/${order.product}`} className="shrink-0">
           <div className="w-20 h-20 rounded-xl overflow-hidden bg-gray-100">
             {product?.primary_image ? (
@@ -91,7 +91,7 @@ function OrderCard({ order, isSeller, onStatusChange }) {
           </div>
         </Link>
 
-        {/* Details */}
+        {/* Detalii */}
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2 flex-wrap">
             <Link to={`/products/${order.product}`} className="font-semibold text-gray-800 hover:text-brand-600 transition truncate">
@@ -137,7 +137,7 @@ function OrderCard({ order, isSeller, onStatusChange }) {
         </div>
       </div>
 
-      {/* Seller action buttons */}
+      {/* Actiunile cumparatorului */}
       {isSeller && transitions.length > 0 && (
         <div className="flex gap-2 mt-4 pt-4 border-t border-gray-100 flex-wrap">
           {transitions.map((t) => (
@@ -153,7 +153,7 @@ function OrderCard({ order, isSeller, onStatusChange }) {
         </div>
       )}
 
-      {/* Buyer: leave review on delivered orders */}
+      {/* Cumparator - lasa recenzie */}
       {!isSeller && order.status === 'delivered' && !hasReview && (
         <div className="mt-4 pt-4 border-t border-gray-100">
           <button

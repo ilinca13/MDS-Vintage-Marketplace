@@ -158,23 +158,18 @@ export default function EditProductPage() {
     setLoading(true)
     setErrors({})
     try {
-        // If user selected a client-side-only category, omit the `category` field
-        // so the backend keeps the existing category. Otherwise include numeric id or null.
         const isExtra = EXTRA_CATEGORIES.some((c) => c.id === form.category)
         const payload = { ...form, price: parseFloat(form.price), is_flagged: isFlagged }
         if (!isExtra) {
           payload.category = form.category ? Number(form.category) : null
         } else {
-          // ensure we don't send the client-side id
           delete payload.category
         }
 
         await api.patch(`/products/${id}/`, payload)
 
-      // Navigate immediately so the edit page unmounts and user can't resubmit.
       navigate(`/products/${id}`)
 
-      // Upload new images in background; swallow errors.
       ;(async () => {
         for (let i = 0; i < newImages.length; i++) {
           try {
@@ -186,7 +181,6 @@ export default function EditProductPage() {
               headers: { 'Content-Type': 'multipart/form-data' },
             })
           } catch (e) {
-            // ignore
           }
         }
       })()
@@ -224,7 +218,7 @@ export default function EditProductPage() {
 
       <form onSubmit={handleSubmit} className="space-y-6">
 
-        {/* Existing images */}
+        {/* Imagini existente */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Fotografii existente
@@ -297,7 +291,7 @@ export default function EditProductPage() {
           )}
         </div>
 
-        {/* Title */}
+        {/* Titlu*/}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Titlu *</label>
           <input
@@ -307,7 +301,7 @@ export default function EditProductPage() {
           {fieldErr('title')}
         </div>
 
-        {/* Description */}
+        {/* Descriere */}
         <div>
           <div className="flex items-center justify-between mb-1">
             <label className="block text-sm font-medium text-gray-700">Descriere *</label>
@@ -361,7 +355,7 @@ export default function EditProductPage() {
           )}
         </div>
 
-        {/* Price + Category */}
+        {/* Pret si categorie */}
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Preț (RON) *</label>
@@ -384,7 +378,7 @@ export default function EditProductPage() {
           </div>
         </div>
 
-        {/* Condition + Size */}
+        {/* Conditii si marime */}
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Stare *</label>
@@ -407,7 +401,7 @@ export default function EditProductPage() {
           </div>
         </div>
 
-        {/* Brand + Location */}
+        {/* Brand si locatie */}
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Brand</label>

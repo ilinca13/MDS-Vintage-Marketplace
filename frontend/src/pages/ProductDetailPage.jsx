@@ -199,10 +199,10 @@ export default function ProductDetailPage() {
         )}
       </div>
 
-      {/* Right — details */}
+      {/* Right — detalii */}
       <div className="w-full lg:w-80 space-y-4">
 
-        {/* Status badge */}
+        {/* Status */}
         <span className={`inline-block text-xs font-semibold px-2.5 py-1 rounded-full ${statusInfo.color}`}>
           {statusInfo.text}
         </span>
@@ -231,7 +231,7 @@ export default function ProductDetailPage() {
           {product.category && <p><span className="font-medium">Categorie:</span> {product.category.name}</p>}
         </div>
 
-        {/* Description */}
+        {/* Descriere */}
         {product.description && (
           <div className="border-t border-gray-100 pt-4">
             <p className="text-sm font-medium text-gray-700 mb-1">Descriere</p>
@@ -241,7 +241,7 @@ export default function ProductDetailPage() {
           </div>
         )}
 
-            {/* Seller */}
+            {/* Vanzator */}
             <div className="border-t border-gray-100 pt-4">
               <p className="text-sm text-gray-500 mb-2">Vânzător</p>
               <Link
@@ -271,7 +271,7 @@ export default function ProductDetailPage() {
               )}
             </div>
 
-        {/* Seller actions */}
+        {/* Actiunile vanzatorului */}
         {isSeller && (
           <div className="border-t border-gray-100 pt-4 space-y-2">
                 <button
@@ -305,7 +305,7 @@ export default function ProductDetailPage() {
           </div>
         )}
 
-        {/* Buyer actions */}
+        {/* Actiunile cumparatorului */}
         {!isSeller && (
           <div className="border-t border-gray-100 pt-4 space-y-2">
             {product.status === 'active' && (
@@ -347,7 +347,7 @@ export default function ProductDetailPage() {
 
     </div>
 
-      {/* Recommendations */}
+      {/* Recomandari */}
       {recommendations.length > 0 && (
         <div className="border-t border-gray-100 pt-8">
           <div className="flex items-center gap-2 mb-4">
@@ -390,7 +390,7 @@ export default function ProductDetailPage() {
         </div>
       )}
 
-      {/* Buy modal */}
+      {/* Cumpara */}
       {showBuyModal && (
 
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -402,7 +402,7 @@ export default function ProductDetailPage() {
               <p className="text-gray-500 mt-0.5">Preț produs: <span className="font-semibold text-gray-700">{product.price} RON</span></p>
             </div>
 
-            {/* Shipping method */}
+            {/* Shipping */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Metodă de livrare</label>
               <div className="space-y-2">
@@ -427,7 +427,7 @@ export default function ProductDetailPage() {
               </div>
             </div>
 
-            {/* Shipping address — hidden for pickup */}
+            {/* Adresa de livrare / ascunsa la ridicare personala */}
             {shippingMethod !== 'ridicare' && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Adresă de livrare</label>
@@ -441,7 +441,7 @@ export default function ProductDetailPage() {
               </div>
             )}
 
-            {/* Payment method */}
+            {/* Metoda de plată */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Metodă de plată</label>
               <div className="flex gap-2">
