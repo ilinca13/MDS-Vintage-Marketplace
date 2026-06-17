@@ -7,7 +7,7 @@ from rest_framework.views import APIView
 from products.models import Product
 from products.serializers import ProductListSerializer
 
-from .services import generate_image_caption, generate_product_description, get_recommendations
+from .services import check_image_source, generate_image_caption, generate_product_description, get_recommendations
 
 
 class GenerateDescriptionView(APIView):
@@ -69,6 +69,31 @@ class GenerateDescriptionView(APIView):
             },
             status=status.HTTP_200_OK,
         )
+
+
+class FlagImageView(APIView):
+    """
+    POST /api/ai/flag-image/
+
+    Accepts multipart/form-data:
+      - image (file, required) — product photo to check
+
+    Returns:
+      - flagged (bool)        — True if image found on Shein/Temu/etc.
+      - reason  (str | null)  — human-readable explanation
+      - matches (list)        — up to 5 source URLs found
+    """
+
+    permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
+
+    def post(self, request):
+        image_file = request.FILES.get('image')
+        if not image_file:
+            return Response({'error': 'No image provided.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        result = check_image_source(image_file)
+        return Response(result, status=status.HTTP_200_OK)
 
 
 class RecommendationsView(APIView):

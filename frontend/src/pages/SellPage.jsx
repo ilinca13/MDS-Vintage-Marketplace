@@ -30,6 +30,7 @@ export default function SellPage() {
 
   const [aiLoading, setAiLoading] = useState(false)
   const [aiHashtags, setAiHashtags] = useState([])
+  const [flagWarning, setFlagWarning] = useState('')
 
   useEffect(() => {
     api.get('/categories/').then(({ data }) => {
@@ -43,7 +44,7 @@ export default function SellPage() {
     setErrors((er) => ({ ...er, [e.target.name]: undefined }))
   }
 
-  const handleImages = (e) => {
+  const handleImages = async (e) => {
     const files = Array.from(e.target.files)
     if (images.length + files.length > 8) {
       setErrors((er) => ({ ...er, images: 'Poți adăuga maxim 8 imagini.' }))
@@ -52,6 +53,20 @@ export default function SellPage() {
     setImages((prev) => [...prev, ...files])
     setPreviews((prev) => [...prev, ...files.map((f) => URL.createObjectURL(f))])
     setErrors((er) => ({ ...er, images: undefined }))
+    setFlagWarning('')
+
+    // Check first image against Shein/Temu
+    const firstNew = images.length === 0 ? files[0] : null
+    if (firstNew) {
+      try {
+        const fd = new FormData()
+        fd.append('image', firstNew)
+        const { data } = await api.post('/ai/flag-image/', fd, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        })
+        if (data.flagged) setFlagWarning(data.reason)
+      } catch { /* silent — flagging is non-blocking */ }
+    }
   }
 
   const removeImage = (i) => {
@@ -77,7 +92,7 @@ export default function SellPage() {
       if (form.condition) fd.append('condition', form.condition)
       const catName = categories.find((c) => String(c.id) === String(form.category))?.name || ''
       if (catName) fd.append('category', catName)
-      images.forEach((img) => fd.append('images', img))
+      if (images[0]) fd.append('image', images[0])
 
       const { data } = await api.post('/ai/generate-description/', fd, {
         headers: { 'Content-Type': 'multipart/form-data' },
@@ -195,6 +210,17 @@ export default function SellPage() {
             onChange={handleImages}
           />
           {errors.images && <p className="text-red-500 text-xs mt-1">{errors.images}</p>}
+          {flagWarning && (
+            <div className="mt-3 flex items-start gap-2 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+              <svg className="w-5 h-5 text-red-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+              </svg>
+              <div>
+                <p className="text-sm font-semibold text-red-700">Imagine suspectă detectată</p>
+                <p className="text-xs text-red-600 mt-0.5">{flagWarning}</p>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Title */}
