@@ -177,9 +177,12 @@ def check_image_source(image_file) -> dict:
             files={'image_file': ('image.jpg', io.BytesIO(image_bytes), 'image/jpeg')},
             timeout=15,
         )
+        print(f"[FLAG AGENT] SerpApi status: {response.status_code}")
+        print(f"[FLAG AGENT] SerpApi response: {response.text[:1000]}")
         response.raise_for_status()
         data = response.json()
-    except Exception:
+    except Exception as e:
+        print(f"[FLAG AGENT] Exception: {e}")
         return {'flagged': False, 'reason': None, 'matches': []}
 
     # Collect all URLs from results
