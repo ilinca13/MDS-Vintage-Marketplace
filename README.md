@@ -59,7 +59,7 @@ To ensure efficient collaboration and maintain a high standard of software devel
 ### Roles and Contributions
 
 * **[@ilinca13](https://github.com/ilinca13) (Backend & Core Frontend):** Designed and implemented the robust Django backend infrastructure, set up database schemas, developed core CRUD operations, and built the initial base frontend.
-* **[@madalinamoraru](https://github.com/madalinamoraru) (AI Integration & Adaptations):** Integrated external APIs (such as SerpApi) for specialized features, crafted the backend logic to handle image-flagging capabilities, and adapted the services to fit the project's requirements.
+* **[@madalinamoraru](https://github.com/madalinamoraru) (AI Integration & Adaptations):** Integrated external APIs (such as OCR Watermark Detection) for specialized features, crafted the backend logic to handle image-flagging capabilities, and adapted the services to fit the project's requirements.
 * **[@jordie31](https://github.com/jordie31) (Frontend Customization & UI/UX):** Took ownership of the React frontend, transforming the base structure into a highly customizable, polished, and responsive user experience, ensuring seamless integration with the backend APIs.
 
 ## Core Features
