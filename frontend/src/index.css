@@ -19,3 +19,17 @@
 .font-yanone {
   font-family: 'Yanone Kaffeesatz', 'Poppins', Inter, system-ui, sans-serif;
 }
+
+.app-content { z-index: 0; position: relative; }
+
+.scroll-to-top {
+  width: 2rem;
+  height: 2rem;
+}
+
+@media (max-width: 640px) {
+  .scroll-to-top {
+    width: 1.75rem;
+    height: 1.75rem;
+  }
+}

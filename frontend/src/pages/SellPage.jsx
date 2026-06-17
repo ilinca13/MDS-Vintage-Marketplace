@@ -96,9 +96,7 @@ export default function SellPage() {
       if (catName) fd.append('category', catName)
       if (images[0]) fd.append('image', images[0])
 
-      const { data } = await api.post('/ai/generate-description/', fd, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      })
+      const { data } = await api.post('/ai/generate-description/', fd)
       setForm((f) => ({ ...f, description: data.description }))
       setAiHashtags(data.hashtags)
     } catch {
