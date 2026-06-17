@@ -31,6 +31,7 @@ export default function EditProductPage() {
   const [aiLoading, setAiLoading] = useState(false)
   const [aiHashtags, setAiHashtags] = useState([])
   const [flagWarning, setFlagWarning] = useState('')
+  const [isFlagged, setIsFlagged] = useState(false)
 
   useEffect(() => {
     Promise.all([
@@ -81,7 +82,8 @@ export default function EditProductPage() {
         const { data } = await api.post('/ai/flag-image/', fd, {
           headers: { 'Content-Type': 'multipart/form-data' },
         })
-        if (data.flagged) setFlagWarning(data.reason)
+        if (data.flagged) { setFlagWarning(data.reason); setIsFlagged(true) }
+        else { setFlagWarning(''); setIsFlagged(false) }
       } catch { /* silent — flagging is non-blocking */ }
     }
   }
@@ -155,6 +157,7 @@ export default function EditProductPage() {
         ...form,
         price: parseFloat(form.price),
         category: form.category || null,
+        is_flagged: isFlagged,
       })
 
       for (let i = 0; i < newImages.length; i++) {
