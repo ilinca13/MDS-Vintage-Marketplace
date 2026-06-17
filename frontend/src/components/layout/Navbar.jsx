@@ -50,6 +50,13 @@ export default function Navbar() {
 
           {user ? (
             <>
+              <Link to="/" className="text-gray-600 hover:text-brand-600 transition flex items-center gap-2" title="Acasă">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M3 10.5L12 4l9 6.5V20a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1V10.5z" />
+                </svg>
+                <span className="sr-only">Pagina principală</span>
+              </Link>
+
               <Link to="/messages" className="text-gray-600 hover:text-brand-600 transition" title="Mesaje">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
