@@ -31,6 +31,7 @@ export default function SellPage() {
   const [aiLoading, setAiLoading] = useState(false)
   const [aiHashtags, setAiHashtags] = useState([])
   const [flagWarning, setFlagWarning] = useState('')
+  const [isFlagged, setIsFlagged] = useState(false)
 
   useEffect(() => {
     api.get('/categories/').then(({ data }) => {
@@ -64,7 +65,8 @@ export default function SellPage() {
         const { data } = await api.post('/ai/flag-image/', fd, {
           headers: { 'Content-Type': 'multipart/form-data' },
         })
-        if (data.flagged) setFlagWarning(data.reason)
+        if (data.flagged) { setFlagWarning(data.reason); setIsFlagged(true) }
+        else { setFlagWarning(''); setIsFlagged(false) }
       } catch { /* silent — flagging is non-blocking */ }
     }
   }
@@ -126,6 +128,7 @@ export default function SellPage() {
         price: parseFloat(form.price),
         // If user picked a client-side-only category (one of EXTRA_CATEGORIES), send null
         category: EXTRA_CATEGORIES.some((c) => c.id === form.category) ? null : (form.category ? Number(form.category) : null),
+        is_flagged: isFlagged,
       })
 
       // Navigate to main page immediately so the create page unmounts and user can't repost.

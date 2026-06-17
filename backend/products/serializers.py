@@ -53,7 +53,7 @@ class ProductDetailSerializer(serializers.ModelSerializer):
         fields = (
             'id', 'title', 'description', 'price',
             'condition', 'status', 'size', 'brand', 'location',
-            'views_count', 'created_at', 'updated_at',
+            'views_count', 'is_flagged', 'created_at', 'updated_at',
             'seller_id', 'seller_username', 'seller_avatar',
             'category', 'images',
         )
@@ -68,9 +68,10 @@ class ProductWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = (
-            'title', 'description', 'price',
-            'category', 'condition', 'size', 'brand', 'location',
+            'id', 'title', 'description', 'price',
+            'category', 'condition', 'size', 'brand', 'location', 'is_flagged',
         )
+        read_only_fields = ('id',)
 
     def create(self, validated_data):
         validated_data['seller'] = self.context['request'].user

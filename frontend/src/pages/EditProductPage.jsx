@@ -33,6 +33,7 @@ export default function EditProductPage() {
   const [aiLoading, setAiLoading] = useState(false)
   const [aiHashtags, setAiHashtags] = useState([])
   const [flagWarning, setFlagWarning] = useState('')
+  const [isFlagged, setIsFlagged] = useState(false)
 
   useEffect(() => {
     Promise.all([
@@ -84,7 +85,8 @@ export default function EditProductPage() {
         const { data } = await api.post('/ai/flag-image/', fd, {
           headers: { 'Content-Type': 'multipart/form-data' },
         })
-        if (data.flagged) setFlagWarning(data.reason)
+        if (data.flagged) { setFlagWarning(data.reason); setIsFlagged(true) }
+        else { setFlagWarning(''); setIsFlagged(false) }
       } catch { /* silent — flagging is non-blocking */ }
     }
   }
@@ -159,7 +161,7 @@ export default function EditProductPage() {
         // If user selected a client-side-only category, omit the `category` field
         // so the backend keeps the existing category. Otherwise include numeric id or null.
         const isExtra = EXTRA_CATEGORIES.some((c) => c.id === form.category)
-        const payload = { ...form, price: parseFloat(form.price) }
+        const payload = { ...form, price: parseFloat(form.price), is_flagged: isFlagged }
         if (!isExtra) {
           payload.category = form.category ? Number(form.category) : null
         } else {
