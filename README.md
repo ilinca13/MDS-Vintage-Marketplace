@@ -383,3 +383,13 @@ The planned implementation would extend the existing `backend/ai_agent/` module 
 
 **Automated testing.** Introducing a unit and integration test suite (e.g. with `pytest` for the backend and a component-testing setup for the frontend) would reduce reliance on manual `curl`-based verification.
 
+### **AI Image Flagging Agent**
+
+**A third agent was implemented to automatically detect product images sourced from fast-fashion platforms such as Shein, Temu, Romwe, or AliExpress, warning both the seller at upload time and the buyer on the product detail page.**
+
+The agent is triggered when a seller uploads the first image on the listing creation or edit page. The image is sent to a dedicated backend endpoint where it is processed using pytesseract, a Python wrapper over the Tesseract OCR engine. The agent extracts all visible text from the image and checks it against a list of known fast-fashion brand names. If a match is found, the product is marked with an `is_flagged` field stored in the database, a warning banner is shown to the seller during the upload flow, and an "Articol posibil fast fashion" notice is displayed to buyers on the product detail page.
+
+This approach was chosen for its simplicity and zero infrastructure cost: it runs entirely locally inside the Docker container, requires no external API calls, and adds no GPU or network dependency.
+
+**Current limitation:** the agent relies exclusively on visible text watermarks embedded in the image. It is effective on photos downloaded directly from Shein or Temu product listings, which typically contain a visible brand watermark or logo rendered as text. It does not detect fast-fashion origin from image content, style, or metadata, and will not flag images where the watermark has been cropped out or where the brand name is not legible at the resolution provided. As a result, detection is inconsistent and works reliably only on unedited, high-quality product photos taken directly from the source platform.
+
