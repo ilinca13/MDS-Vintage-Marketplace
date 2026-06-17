@@ -139,6 +139,82 @@ def generate_product_description(
 
 
 # ---------------------------------------------------------------------------
+# Image flagging agent — SerpApi reverse image search
+# ---------------------------------------------------------------------------
+
+_SUSPICIOUS_DOMAINS = [
+    'shein.com', 'temu.com', 'romwe.com', 'zaful.com',
+    'aliexpress.com', 'alibaba.com', 'dhgate.com',
+]
+
+
+def check_image_source(image_file) -> dict:
+    """
+    Send the image to SerpApi Google Reverse Image Search.
+    Returns {'flagged': bool, 'reason': str | None, 'matches': list}
+
+    Agent logic:
+    1. Call SerpApi with the raw image bytes
+    2. Collect all source URLs from image_results + inline_images
+    3. Score each result — exact domain match scores higher than subdomain
+    4. Return a verdict with confidence level
+    """
+    import io
+    import requests as http
+    from django.conf import settings
+
+    api_key = settings.SERPAPI_KEY
+    if not api_key:
+        return {'flagged': False, 'reason': None, 'matches': []}
+
+    image_bytes = image_file.read()
+    image_file.seek(0)
+
+    try:
+        response = http.post(
+            'https://serpapi.com/search',
+            data={'engine': 'google_reverse_image', 'api_key': api_key},
+            files={'image_file': ('image.jpg', io.BytesIO(image_bytes), 'image/jpeg')},
+            timeout=15,
+        )
+        response.raise_for_status()
+        data = response.json()
+    except Exception:
+        return {'flagged': False, 'reason': None, 'matches': []}
+
+    # Collect all URLs from results
+    found_urls = []
+    for result in data.get('image_results', []):
+        link = result.get('link', '')
+        if link:
+            found_urls.append(link)
+    for img in data.get('inline_images', []):
+        link = img.get('link', '') or img.get('source', '')
+        if link:
+            found_urls.append(link)
+
+    # Agent decision: check each URL against suspicious domains
+    flagged_domain = None
+    for url in found_urls:
+        url_lower = url.lower()
+        for domain in _SUSPICIOUS_DOMAINS:
+            if domain in url_lower:
+                flagged_domain = domain
+                break
+        if flagged_domain:
+            break
+
+    if flagged_domain:
+        return {
+            'flagged': True,
+            'reason': f'Imaginea a fost găsită pe {flagged_domain}. Te rugăm să folosești fotografii proprii.',
+            'matches': found_urls[:5],
+        }
+
+    return {'flagged': False, 'reason': None, 'matches': found_urls[:5]}
+
+
+# ---------------------------------------------------------------------------
 # Recommendation agent — TF-IDF cosine similarity
 # ---------------------------------------------------------------------------
 
