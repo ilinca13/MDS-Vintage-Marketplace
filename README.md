@@ -15,7 +15,7 @@
 [![JWT](https://img.shields.io/badge/Auth-JWT-black?logo=jsonwebtokens&logoColor=white)](https://jwt.io/)
 [![scikit-learn](https://img.shields.io/badge/scikit--learn-TF--IDF-F7931E?logo=scikitlearn&logoColor=white)](https://scikit-learn.org/)
 
-A **full-stack** web marketplace for buying and selling second-hand and vintage clothing, inspired by platforms such as Vinted. The project was developed as a semestrial group project for our **Software Development Methodologies** course (2nd Year, 2nd Semester) and extends a conventional marketplace with several **AI-assisted modules** covering product description generation, tag suggestion, and content-based product recommendations.
+A **full-stack** web marketplace for buying and selling second-hand and vintage clothing, inspired by platforms such as Vinted. The project was developed as a semester group project for our **Software Development Methodologies** course (2nd Year, 2nd Semester) and extends a conventional marketplace with several **AI-assisted modules** covering product description generation, tag suggestion, and content-based product recommendations.
 
 This repository was built using a **Django REST Framework** backend, a **React (Vite)** frontend, and a **Dockerized** development environment.
 
