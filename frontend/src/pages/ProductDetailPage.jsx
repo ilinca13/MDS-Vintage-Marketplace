@@ -17,6 +17,27 @@ const STATUS_LABEL = {
   sold: { text: 'Vândut', color: 'bg-red-100 text-red-700' },
 }
 
+function DescriptionWithTags({ text }) {
+  const parts = text.split(/(#\w+)/g)
+  return (
+    <>
+      {parts.map((part, i) =>
+        part.startsWith('#') ? (
+          <Link
+            key={i}
+            to={`/?search=${encodeURIComponent(part)}`}
+            className="text-brand-500 hover:text-brand-700 hover:underline font-medium"
+          >
+            {part}
+          </Link>
+        ) : (
+          <span key={i}>{part}</span>
+        )
+      )}
+    </>
+  )
+}
+
 function StarScore({ label, value }) {
   if (value === null) return null
   return (
@@ -201,7 +222,9 @@ export default function ProductDetailPage() {
         {product.description && (
           <div className="border-t border-gray-100 pt-4">
             <p className="text-sm font-medium text-gray-700 mb-1">Descriere</p>
-            <p className="text-sm text-gray-600 whitespace-pre-line">{product.description}</p>
+            <p className="text-sm text-gray-600 whitespace-pre-line">
+              <DescriptionWithTags text={product.description} />
+            </p>
           </div>
         )}
 
