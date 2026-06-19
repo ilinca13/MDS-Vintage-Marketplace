@@ -204,7 +204,7 @@ Sensitive configuration is kept out of version control and supplied through a `.
 - PostgreSQL database name, user, password, host, and port
 - Default superuser username, email, and password, used by the entrypoint script to create an admin account automatically on first startup
 
-Refer to `.env.example` (if present in the repository) for the exact variable names expected by the project.
+Refer to `.env.example`  for the exact variable names expected by the project.
 
 ## API Reference
 
